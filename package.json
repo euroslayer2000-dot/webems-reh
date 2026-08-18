@@ -6,21 +6,55 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.2.0",
+    "@hookform/resolvers": "^5.9.1",
+    "@vercel/blob": "^2.8.0",
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
+    "ckeditor5": "^48.4.0",
+    "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.31.0",
     "next": "16.3.1",
+    "next-auth": "^5.0.0-beta.32",
+    "qrcode": "^1.5.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.85.0",
+    "react-leaflet": "^5.0.0",
+    "sanitize-html": "^2.17.7",
+    "sonner": "^2.0.8",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "prisma@6.19.3": true
   }
 }

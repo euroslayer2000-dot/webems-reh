@@ -1,0 +1,379 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Banner {
+  id         Int              @id @default(autoincrement()) @db.UnsignedInt
+  title      String?          @db.VarChar(200)
+  image      String           @db.VarChar(255)
+  link_url   String?          @db.VarChar(255)
+  position   banners_position @default(hero)
+  sort_order Int              @default(0)
+  is_active  Boolean          @default(true)
+  created_at DateTime         @default(now()) @db.DateTime(0)
+
+  @@index([position, is_active], map: "idx_banners_pos")
+  @@map("banners")
+}
+
+model Category {
+  id         Int             @id @default(autoincrement()) @db.UnsignedInt
+  name       String          @db.VarChar(120)
+  slug       String          @db.VarChar(150)
+  type       categories_type @default(news)
+  created_at DateTime        @default(now()) @db.DateTime(0)
+  downloads  Download[]
+  news       News[]
+
+  @@unique([slug, type], map: "uq_categories_slug")
+  @@index([type], map: "idx_categories_type")
+  @@map("categories")
+}
+
+model Contact {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  name       String   @db.VarChar(150)
+  email      String?  @db.VarChar(150)
+  phone      String?  @db.VarChar(30)
+  subject    String?  @db.VarChar(200)
+  message    String   @db.Text
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.DateTime(0)
+
+  @@index([is_read], map: "idx_contacts_read")
+  @@map("contacts")
+}
+
+model Download {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  category_id    Int?      @db.UnsignedInt
+  title          String    @db.VarChar(255)
+  description    String?   @db.Text
+  file_path      String    @db.VarChar(255)
+  file_type      String?   @db.VarChar(20)
+  file_size      Int       @default(0) @db.UnsignedInt
+  download_count Int       @default(0) @db.UnsignedInt
+  created_at     DateTime  @default(now()) @db.DateTime(0)
+  category       Category? @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "fk_downloads_category")
+
+  @@index([category_id], map: "idx_downloads_category")
+  @@map("downloads")
+}
+
+model Equipment {
+  id                    Int                            @id @default(autoincrement()) @db.UnsignedInt
+  category_id           Int?                           @db.UnsignedInt
+  code                  String                         @unique(map: "uq_equipment_code") @db.VarChar(50)
+  name                  String                         @db.VarChar(200)
+  description           String?                        @db.Text
+  photo                 String?                        @db.VarChar(255)
+  photo2                String?                        @db.VarChar(255)
+  photo3                String?                        @db.VarChar(255)
+  brand                 String?                        @db.VarChar(150)
+  unit                  String                         @default("ชิ้น") @db.VarChar(30)
+  location              String?                        @db.VarChar(150)
+  status                equipment_status               @default(available)
+  purchase_date         DateTime?                      @db.Date
+  purchase_price        Decimal?                       @db.Decimal(12, 2)
+  warranty_document     String?                        @db.VarChar(255)
+  receipt_document      String?                        @db.VarChar(255)
+  created_at            DateTime                       @default(now()) @db.DateTime(0)
+  category              EquipmentCategory?             @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "fk_equipment_category")
+  borrows               EquipmentBorrow[]
+  status_logs           EquipmentStatusLog[]
+  maintenance_schedules EquipmentMaintenanceSchedule[]
+  stock_take_items      EquipmentStockTakeItem[]
+
+  @@index([category_id], map: "idx_equipment_category")
+  @@index([status], map: "idx_equipment_status")
+  @@map("equipment")
+}
+
+model EquipmentStatusLog {
+  id           Int               @id @default(autoincrement()) @db.UnsignedInt
+  equipment_id Int               @db.UnsignedInt
+  old_status   equipment_status?
+  new_status   equipment_status
+  note         String?           @db.VarChar(255)
+  changed_at   DateTime          @default(now()) @db.DateTime(0)
+  equipment    Equipment         @relation(fields: [equipment_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_status_log_equipment")
+
+  @@index([equipment_id], map: "idx_status_log_equipment")
+  @@map("equipment_status_logs")
+}
+
+model EquipmentMaintenanceSchedule {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  equipment_id   Int       @db.UnsignedInt
+  title          String    @db.VarChar(200)
+  scheduled_date DateTime  @db.Date
+  completed_date DateTime? @db.Date
+  note           String?   @db.Text
+  created_at     DateTime  @default(now()) @db.DateTime(0)
+  equipment      Equipment @relation(fields: [equipment_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_maint_equipment")
+
+  @@index([equipment_id], map: "idx_maint_equipment")
+  @@index([scheduled_date], map: "idx_maint_scheduled")
+  @@map("equipment_maintenance_schedules")
+}
+
+model EquipmentStockTake {
+  id           Int                      @id @default(autoincrement()) @db.UnsignedInt
+  title        String                   @db.VarChar(200)
+  started_at   DateTime                 @default(now()) @db.DateTime(0)
+  completed_at DateTime?                @db.DateTime(0)
+  note         String?                  @db.Text
+  created_at   DateTime                 @default(now()) @db.DateTime(0)
+  items        EquipmentStockTakeItem[]
+
+  @@map("equipment_stock_takes")
+}
+
+model EquipmentStockTakeItem {
+  id            Int                @id @default(autoincrement()) @db.UnsignedInt
+  stock_take_id Int                @db.UnsignedInt
+  equipment_id  Int                @db.UnsignedInt
+  checked       Boolean            @default(false)
+  checked_at    DateTime?          @db.DateTime(0)
+  note          String?            @db.VarChar(255)
+  stock_take    EquipmentStockTake @relation(fields: [stock_take_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_stock_take_item_session")
+  equipment     Equipment          @relation(fields: [equipment_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_stock_take_item_equipment")
+
+  @@unique([stock_take_id, equipment_id], map: "uq_stock_take_item")
+  @@index([equipment_id], map: "idx_stock_take_item_equipment")
+  @@map("equipment_stock_take_items")
+}
+
+model EquipmentBorrow {
+  id               Int                                 @id @default(autoincrement()) @db.UnsignedInt
+  equipment_id     Int                                 @db.UnsignedInt
+  borrower_name    String                              @db.VarChar(150)
+  borrower_contact String?                             @db.VarChar(150)
+  borrow_date      DateTime                            @db.DateTime(0)
+  due_date         DateTime?                           @db.Date
+  return_date      DateTime?                           @db.DateTime(0)
+  return_condition equipment_borrows_return_condition?
+  note             String?                             @db.Text
+  created_at       DateTime                            @default(now()) @db.DateTime(0)
+  equipment        Equipment                           @relation(fields: [equipment_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_borrow_equipment")
+  notifications    Notification[]
+
+  @@index([equipment_id], map: "idx_borrow_equipment")
+  @@index([return_date], map: "idx_borrow_return_date")
+  @@map("equipment_borrows")
+}
+
+model EquipmentCategory {
+  id         Int         @id @default(autoincrement()) @db.UnsignedInt
+  code       String      @unique(map: "uq_equip_cat_code") @db.VarChar(20)
+  name       String      @db.VarChar(120)
+  sort_order Int         @default(0)
+  equipment  Equipment[]
+
+  @@map("equipment_categories")
+}
+
+model Gallery {
+  id          Int            @id @default(autoincrement()) @db.UnsignedInt
+  title       String         @db.VarChar(200)
+  slug        String         @unique(map: "uq_galleries_slug") @db.VarChar(220)
+  description String?        @db.Text
+  cover_image String?        @db.VarChar(255)
+  created_at  DateTime       @default(now()) @db.DateTime(0)
+  images      GalleryImage[]
+
+  @@map("galleries")
+}
+
+model GalleryImage {
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  gallery_id Int     @db.UnsignedInt
+  image_path String  @db.VarChar(255)
+  caption    String? @db.VarChar(255)
+  sort_order Int     @default(0)
+  gallery    Gallery @relation(fields: [gallery_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_gimg_gallery")
+
+  @@index([gallery_id], map: "idx_gimg_gallery")
+  @@map("gallery_images")
+}
+
+model News {
+  id           Int         @id @default(autoincrement()) @db.UnsignedInt
+  category_id  Int?        @db.UnsignedInt
+  title        String      @db.VarChar(255)
+  slug         String      @unique(map: "uq_news_slug") @db.VarChar(280)
+  excerpt      String?     @db.VarChar(500)
+  content      String?     @db.LongText
+  cover_image  String?     @db.VarChar(255)
+  views        Int         @default(0) @db.UnsignedInt
+  status       news_status @default(draft)
+  published_at DateTime?   @db.DateTime(0)
+  author_id    Int?        @db.UnsignedInt
+  created_at   DateTime    @default(now()) @db.DateTime(0)
+  updated_at   DateTime    @updatedAt @db.DateTime(0)
+  author       User?       @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "fk_news_author")
+  category     Category?   @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "fk_news_category")
+
+  @@index([author_id], map: "idx_news_author")
+  @@index([category_id], map: "idx_news_category")
+  @@index([status, published_at], map: "idx_news_status_pub")
+  @@fulltext([title, content], map: "ft_news_search")
+  @@map("news")
+}
+
+model Notification {
+  id         Int                 @id @default(autoincrement()) @db.UnsignedInt
+  type       String              @db.VarChar(50)
+  borrow_id  Int                 @db.UnsignedInt
+  level      notifications_level
+  title      String              @db.VarChar(255)
+  message    String              @db.VarChar(500)
+  is_read    Boolean             @default(false)
+  created_at DateTime            @default(now()) @db.DateTime(0)
+  updated_at DateTime            @updatedAt @db.DateTime(0)
+  borrow     EquipmentBorrow     @relation(fields: [borrow_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_notif_borrow")
+
+  @@unique([type, borrow_id], map: "uniq_notif_type_borrow")
+  @@index([borrow_id], map: "fk_notif_borrow")
+  @@index([is_read], map: "idx_notif_is_read")
+  @@map("notifications")
+}
+
+model OrgStructure {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  title      String?  @db.VarChar(200)
+  image      String   @db.VarChar(255)
+  sort_order Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.DateTime(0)
+
+  @@index([is_active, sort_order], map: "idx_org_structures_active")
+  @@map("org_structures")
+}
+
+model Personnel {
+  id         Int             @id @default(autoincrement()) @db.UnsignedInt
+  group_id   Int?            @db.UnsignedInt
+  title      String?         @db.VarChar(20)
+  first_name String?         @db.VarChar(80)
+  last_name  String?         @db.VarChar(80)
+  full_name  String          @db.VarChar(150)
+  position   String?         @db.VarChar(150)
+  photo      String?         @db.VarChar(255)
+  phone      String?         @db.VarChar(30)
+  email      String?         @db.VarChar(150)
+  bio        String?         @db.Text
+  sort_order Int             @default(0)
+  is_active  Boolean         @default(true)
+  created_at DateTime        @default(now()) @db.DateTime(0)
+  group      PersonnelGroup? @relation(fields: [group_id], references: [id], onUpdate: Restrict, map: "fk_personnel_group")
+
+  @@index([group_id], map: "idx_personnel_group")
+  @@map("personnel")
+}
+
+model PersonnelGroup {
+  id         Int         @id @default(autoincrement()) @db.UnsignedInt
+  code       String      @unique(map: "uq_pgroup_code") @db.VarChar(20)
+  name       String      @db.VarChar(120)
+  sort_order Int         @default(0)
+  personnel  Personnel[]
+
+  @@map("personnel_groups")
+}
+
+model Setting {
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  setting_key   String  @unique(map: "uq_settings_key") @db.VarChar(100)
+  setting_value String? @db.Text
+  setting_group String  @default("general") @db.VarChar(50)
+
+  @@map("settings")
+}
+
+model Station {
+  id           Int           @id @default(autoincrement()) @db.UnsignedInt
+  name         String        @db.VarChar(150)
+  code         String?       @db.VarChar(30)
+  type         stations_type @default(ALS)
+  lat          Decimal       @db.Decimal(10, 7)
+  lng          Decimal       @db.Decimal(10, 7)
+  address      String?       @db.VarChar(255)
+  phone        String?       @db.VarChar(30)
+  service_area String?       @db.VarChar(255)
+  description  String?       @db.Text
+  photo        String?       @db.VarChar(255)
+  is_active    Boolean       @default(true)
+  sort_order   Int           @default(0)
+  created_at   DateTime      @default(now()) @db.DateTime(0)
+
+  @@index([type, is_active], map: "idx_stations_type")
+  @@map("stations")
+}
+
+model User {
+  id            Int        @id @default(autoincrement()) @db.UnsignedInt
+  name          String     @db.VarChar(120)
+  username      String     @unique(map: "uq_users_username") @db.VarChar(60)
+  email         String?    @unique(map: "uq_users_email") @db.VarChar(150)
+  password      String     @db.VarChar(255)
+  role          users_role @default(editor)
+  avatar        String?    @db.VarChar(255)
+  is_active     Boolean    @default(true)
+  last_login_at DateTime?  @db.DateTime(0)
+  created_at    DateTime   @default(now()) @db.DateTime(0)
+  updated_at    DateTime   @updatedAt @db.DateTime(0)
+  news          News[]
+
+  @@map("users")
+}
+
+enum categories_type {
+  news
+  download
+}
+
+enum notifications_level {
+  due_soon
+  overdue
+}
+
+enum stations_type {
+  ALS
+  BLS
+}
+
+enum banners_position {
+  hero
+  sidebar
+  popup
+}
+
+enum users_role {
+  superadmin
+  admin
+  editor
+}
+
+enum equipment_borrows_return_condition {
+  normal  @map("ปกติ")
+  damaged @map("ชำรุด")
+}
+
+enum news_status {
+  draft
+  published
+}
+
+enum equipment_status {
+  available   @map("พร้อมใช้งาน")
+  borrowed    @map("ถูกยืม")
+  damaged     @map("ชำรุด")
+  maintenance @map("ซ่อมบำรุง")
+  disposed    @map("จำหน่ายแล้ว")
+}
