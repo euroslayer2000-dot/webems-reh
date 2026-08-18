@@ -1,8 +1,9 @@
 # EMS REH101 — Next.js rewrite
 
 Full-stack Next.js rewrite of the Laravel EMS-REH101 app (public site + admin
-CMS for the Emergency Medical Service unit of Roi Et Hospital). Same MySQL
-database, connected via Prisma.
+CMS for the Emergency Medical Service unit of Roi Et Hospital). Data was
+migrated off the Laravel app's MySQL database into Postgres (Neon, via the
+Vercel Marketplace integration), connected via Prisma.
 
 ## Local development
 
@@ -40,11 +41,12 @@ Admin CMS is at `/admin/login`.
 
 ## Deployment (Vercel)
 
-1. **Database**: not yet decided. Vercel functions are serverless — many
-   short-lived connections — so the MySQL host needs to tolerate that well
-   (a pooling-aware host, or put [Prisma Accelerate](https://www.prisma.io/data-platform/accelerate)
-   in front of a plain MySQL instance). Whatever it ends up being, set
-   `DATABASE_URL` in the Vercel project's environment variables.
+1. **Database**: Postgres via [Neon](https://neon.com), installed as a
+   Vercel Marketplace integration (Storage tab → Create Database → Neon).
+   This provisions the DB and injects `DATABASE_URL` into the project's
+   environment variables automatically — Neon's pooled connection string
+   handles Vercel's many short-lived serverless connections fine on its own.
+   Data was migrated one-time from the original Laravel MySQL database.
 2. **Blob storage**: Project → Storage → Create Database → Blob. Vercel
    injects `BLOB_READ_WRITE_TOKEN` automatically for deployments; run
    `vercel env pull` to get it into your local `.env` too.
