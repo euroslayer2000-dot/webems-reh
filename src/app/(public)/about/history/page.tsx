@@ -21,13 +21,11 @@ export default async function AboutHistoryPage() {
       <Container className="max-w-3xl py-12">
         <HistoryImageSlider />
 
-        {setting?.setting_value ? (
+        {setting?.setting_value && (
           <div
             className="prose prose-sm sm:prose-base max-w-none prose-headings:text-text prose-p:text-text"
             dangerouslySetInnerHTML={{ __html: setting.setting_value }}
           />
-        ) : (
-          <p className="text-sm text-text-muted">ยังไม่มีข้อมูล</p>
         )}
       </Container>
     </div>
