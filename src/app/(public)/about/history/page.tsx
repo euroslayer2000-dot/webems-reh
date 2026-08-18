@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/public/container";
 import { PageHero } from "@/components/public/page-hero";
+import { HistoryImageSlider } from "@/components/public/history-image-slider";
 
 export const revalidate = 60;
 
@@ -18,6 +19,8 @@ export default async function AboutHistoryPage() {
       <PageHero title="ประวัติความเป็นมา" />
 
       <Container className="max-w-3xl py-12">
+        <HistoryImageSlider />
+
         {setting?.setting_value ? (
           <div
             className="prose prose-sm sm:prose-base max-w-none prose-headings:text-text prose-p:text-text"
