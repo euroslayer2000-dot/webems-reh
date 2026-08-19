@@ -110,7 +110,7 @@ export function StructureLightbox({
               className="relative block w-full cursor-zoom-in"
               style={{ aspectRatio: "16 / 9" }}
             >
-              <Image src={item.src} alt={item.title ?? "โครงสร้างหน่วยงาน"} fill sizes="100vw" className="object-contain" />
+              <Image src={item.src} alt={item.title ?? "โครงสร้างหน่วยงาน"} fill sizes="100vw" className="object-contain" unoptimized />
             </button>
             {item.title && (
               <figcaption className="border-t border-border p-4 text-center text-sm font-medium text-text">
@@ -122,14 +122,14 @@ export function StructureLightbox({
       </div>
 
       {openIndex !== null && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-4" onClick={close}>
+        <div className="fixed inset-0 z-[1050] flex flex-col items-center justify-center bg-black/90 p-4" onClick={close}>
           <button
             type="button"
             onClick={close}
             aria-label="ยกเลิก"
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-900 shadow-lg ring-1 ring-black/10 transition-all hover:scale-105 hover:bg-gray-100 active:scale-95 sm:right-6 sm:top-6"
           >
-            <X size={20} />
+            <X size={22} strokeWidth={2.5} />
           </button>
 
           {items.length > 1 && (
@@ -168,6 +168,7 @@ export function StructureLightbox({
                 sizes="100vw"
                 className="object-contain"
                 draggable={false}
+                unoptimized
               />
             </div>
           </div>

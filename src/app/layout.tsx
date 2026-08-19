@@ -38,7 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         {/* Runs before hydration to avoid a flash of the wrong theme. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script
+          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

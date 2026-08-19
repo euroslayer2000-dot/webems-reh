@@ -33,14 +33,14 @@ export function LightboxGallery({ images }: { images: { id: number; src: string;
       </div>
 
       {openIndex !== null && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-4">
+        <div className="fixed inset-0 z-[1050] flex flex-col items-center justify-center bg-black/90 p-4">
           <button
             type="button"
             onClick={close}
             aria-label="ปิด"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-900 shadow-lg ring-1 ring-black/10 transition-all hover:scale-105 hover:bg-gray-100 active:scale-95 sm:right-6 sm:top-6"
           >
-            <X size={20} />
+            <X size={22} strokeWidth={2.5} />
           </button>
 
           <button

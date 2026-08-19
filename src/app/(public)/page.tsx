@@ -238,9 +238,9 @@ export default async function HomePage() {
               <Image
                 src="/assets/img/reh8.jpg"
                 alt="แนะนำหน่วยงาน"
-                width={400}
-                height={500}
-                className="h-[500px] w-[400px] max-w-full rounded-[var(--radius-lg)] bg-surface object-cover shadow-[var(--shadow-lg)]"
+                width={819}
+                height={2048}
+                className="h-auto w-[340px] max-w-full rounded-[var(--radius-lg)] bg-surface object-contain shadow-[var(--shadow-lg)]"
               />
               <div className="absolute -bottom-[22px] -right-[14px] hidden rounded-[var(--radius)] border border-border bg-surface p-4 shadow-[var(--shadow-md)] lg:block">
                 <div className="flex items-center gap-2">
