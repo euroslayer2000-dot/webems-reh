@@ -62,7 +62,6 @@ export function LoginForm({ next }: { next: string }) {
             id="username"
             type="text"
             autoComplete="username"
-            placeholder="admin"
             className="w-full rounded-[10px] bg-transparent px-3 py-2.5 text-sm text-[#16302a] placeholder:text-[#9fb0aa] focus:outline-none"
             {...register("username")}
           />
@@ -80,7 +79,6 @@ export function LoginForm({ next }: { next: string }) {
             id="password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
-            placeholder="••••••••"
             className="w-full bg-transparent px-3 py-2.5 text-sm text-[#16302a] placeholder:text-[#9fb0aa] focus:outline-none"
             {...register("password")}
           />
