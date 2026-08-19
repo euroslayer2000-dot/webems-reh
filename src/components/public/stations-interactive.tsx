@@ -33,13 +33,13 @@ export function StationsInteractive({ points }: { points: StationPoint[] }) {
         <StationsMapLoader points={points} selectedId={selectedId} />
       </div>
 
-      <div className="flex flex-col gap-4 lg:max-h-[560px] lg:overflow-y-auto lg:pr-1">
+      <div className="flex max-h-[420px] flex-col gap-4 overflow-y-auto pr-1 lg:max-h-[560px]">
         {groups.length === 0 && <p className="py-10 text-center text-sm text-text-muted">ยังไม่มีข้อมูลหน่วย</p>}
 
         {groups.map((group) => {
           const isOpen = openGroups[group.type] ?? true;
           return (
-            <div key={group.type} className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+            <div key={group.type} className="shrink-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
               <button
                 type="button"
                 onClick={() => toggleGroup(group.type)}
