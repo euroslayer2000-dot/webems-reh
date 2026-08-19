@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requirePageAccess } from "@/lib/admin-auth";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
@@ -7,7 +7,7 @@ import { PageHead } from "@/components/admin/page-head";
 import { AdminCard } from "@/components/admin/admin-card";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { btnDangerSm, btnGhostSm, btnPrimary } from "@/components/admin/button-styles";
-import { deleteStation, toggleStation } from "./actions";
+import { deleteStation, moveStation, toggleStation } from "./actions";
 
 export default async function AdminStationPage() {
   await requirePageAccess("station");
@@ -36,7 +36,7 @@ export default async function AdminStationPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {stations.map((station) => (
+            {stations.map((station, i) => (
               <tr key={station.id}>
                 <td className="px-5 py-2.5 font-semibold text-text">{station.name}</td>
                 <td className="px-5 py-2.5 text-text-muted">{station.type}</td>
@@ -46,6 +46,20 @@ export default async function AdminStationPage() {
                 </td>
                 <td className="px-5 py-2.5">
                   <div className="flex justify-end gap-1.5">
+                    <form action={moveStation}>
+                      <input type="hidden" name="id" value={station.id} />
+                      <input type="hidden" name="direction" value="up" />
+                      <button type="submit" disabled={i === 0} aria-label="เลื่อนขึ้น" className={`${btnGhostSm} disabled:opacity-30`}>
+                        <ChevronUp size={15} />
+                      </button>
+                    </form>
+                    <form action={moveStation}>
+                      <input type="hidden" name="id" value={station.id} />
+                      <input type="hidden" name="direction" value="down" />
+                      <button type="submit" disabled={i === stations.length - 1} aria-label="เลื่อนลง" className={`${btnGhostSm} disabled:opacity-30`}>
+                        <ChevronDown size={15} />
+                      </button>
+                    </form>
                     <form action={toggleStation}>
                       <input type="hidden" name="id" value={station.id} />
                       <button type="submit" className={btnGhostSm}>

@@ -35,6 +35,15 @@ export async function createCategory(formData: FormData): Promise<void> {
 export async function deleteCategory(formData: FormData): Promise<void> {
   await requireActionAccess("category");
   const id = Number(formData.get("id"));
+
+  const [newsCount, downloadCount] = await Promise.all([
+    prisma.news.count({ where: { category_id: id } }),
+    prisma.download.count({ where: { category_id: id } }),
+  ]);
+  if (newsCount > 0 || downloadCount > 0) {
+    redirectWithFlash("/admin/category", "มีข่าวหรือเอกสารดาวน์โหลดใช้หมวดหมู่นี้อยู่ ไม่สามารถลบได้", "error");
+  }
+
   await prisma.category.delete({ where: { id } });
 
   redirectWithFlash("/admin/category", "ลบหมวดหมู่เรียบร้อยแล้ว");

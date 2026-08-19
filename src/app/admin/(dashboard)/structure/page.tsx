@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requirePageAccess } from "@/lib/admin-auth";
 import { uploadUrl } from "@/lib/upload";
@@ -9,7 +9,7 @@ import { PageHead } from "@/components/admin/page-head";
 import { AdminCard } from "@/components/admin/admin-card";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { btnDangerSm, btnGhostSm, btnPrimary } from "@/components/admin/button-styles";
-import { deleteStructure, toggleStructure } from "./actions";
+import { deleteStructure, moveStructure, toggleStructure } from "./actions";
 
 export default async function AdminStructurePage() {
   await requirePageAccess("structure");
@@ -27,7 +27,7 @@ export default async function AdminStructurePage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {structures.map((item) => (
+        {structures.map((item, i) => (
           <AdminCard key={item.id}>
             <div className="relative aspect-video bg-bg-soft">
               <Image src={uploadUrl(item.image)} alt={item.title ?? ""} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
@@ -37,7 +37,21 @@ export default async function AdminStructurePage() {
               <div className="mt-1.5">
                 <StatusBadge active={item.is_active} activeLabel="แสดงผล" inactiveLabel="ซ่อน" />
               </div>
-              <div className="mt-3 flex gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <form action={moveStructure}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <input type="hidden" name="direction" value="up" />
+                  <button type="submit" disabled={i === 0} aria-label="เลื่อนขึ้น" className={`${btnGhostSm} disabled:opacity-30`}>
+                    <ChevronUp size={15} />
+                  </button>
+                </form>
+                <form action={moveStructure}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <input type="hidden" name="direction" value="down" />
+                  <button type="submit" disabled={i === structures.length - 1} aria-label="เลื่อนลง" className={`${btnGhostSm} disabled:opacity-30`}>
+                    <ChevronDown size={15} />
+                  </button>
+                </form>
                 <form action={toggleStructure}>
                   <input type="hidden" name="id" value={item.id} />
                   <button type="submit" className={btnGhostSm}>

@@ -16,7 +16,6 @@ const stationSchema = z.object({
   phone: z.string().optional(),
   service_area: z.string().optional(),
   description: z.string().optional(),
-  sort_order: z.string().optional(),
 });
 
 export type StationFormState = {
@@ -35,7 +34,6 @@ function parse(formData: FormData) {
     phone: formData.get("phone") || undefined,
     service_area: formData.get("service_area") || undefined,
     description: formData.get("description") || undefined,
-    sort_order: formData.get("sort_order") || undefined,
   });
 }
 
@@ -56,7 +54,6 @@ function buildData(parsed: z.infer<typeof stationSchema>) {
     phone: parsed.phone || null,
     service_area: parsed.service_area || null,
     description: parsed.description || null,
-    sort_order: parsed.sort_order ? Number(parsed.sort_order) : 0,
   };
 }
 
@@ -68,7 +65,9 @@ export async function createStation(_prev: StationFormState, formData: FormData)
   const photo = formData.get("photo");
   const photoPath = photo instanceof File && photo.size > 0 ? await saveUpload(photo, "stations") : null;
 
-  await prisma.station.create({ data: { ...buildData(parsed.data), is_active: formData.get("is_active") === "on", photo: photoPath } });
+  const count = await prisma.station.count();
+
+  await prisma.station.create({ data: { ...buildData(parsed.data), sort_order: count, is_active: formData.get("is_active") === "on", photo: photoPath } });
 
   redirectWithFlash("/admin/station", "เพิ่มจุดหน่วยกู้ชีพเรียบร้อยแล้ว");
 }
@@ -90,6 +89,25 @@ export async function updateStation(id: number, _prev: StationFormState, formDat
   await prisma.station.update({ where: { id }, data: { ...buildData(parsed.data), is_active: formData.get("is_active") === "on", photo: photoPath } });
 
   redirectWithFlash("/admin/station", "บันทึกการแก้ไขเรียบร้อยแล้ว");
+}
+
+export async function moveStation(formData: FormData): Promise<void> {
+  await requireActionAccess("station");
+  const id = Number(formData.get("id"));
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+
+  const siblings = await prisma.station.findMany({ orderBy: [{ sort_order: "asc" }, { id: "asc" }] });
+  const index = siblings.findIndex((s) => s.id === id);
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith >= 0 && swapWith < siblings.length) {
+    const reordered = [...siblings];
+    [reordered[index], reordered[swapWith]] = [reordered[swapWith], reordered[index]];
+    await prisma.$transaction(
+      reordered.map((item, i) => prisma.station.update({ where: { id: item.id }, data: { sort_order: i } }))
+    );
+  }
+
+  redirectWithFlash("/admin/station", "จัดลำดับใหม่เรียบร้อยแล้ว");
 }
 
 export async function toggleStation(formData: FormData): Promise<void> {

@@ -139,7 +139,7 @@ export default async function AdminEquipmentBorrowPage() {
                             <option value="normal">ปกติ</option>
                             <option value="damaged">ชำรุด</option>
                           </select>
-                          <button type="submit" className={btnGhostSm}>รับคืน</button>
+                          <ConfirmSubmitButton confirmText="ยืนยันรับคืนครุภัณฑ์นี้ ?" className={btnGhostSm}>รับคืน</ConfirmSubmitButton>
                         </form>
                       )}
                       <Link href={`/admin/equipment-borrow/${loan.id}/edit`} className={btnGhostSm}>แก้ไข</Link>

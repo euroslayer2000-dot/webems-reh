@@ -24,10 +24,6 @@ export function StructureForm({ structure }: { structure: StructureRecord | null
             <input id="title" name="title" defaultValue={structure?.title ?? ""} className={inputClass} />
           </FormField>
 
-          <FormField label="ลำดับการแสดงผล" htmlFor="sort_order">
-            <input id="sort_order" name="sort_order" type="number" defaultValue={structure?.sort_order ?? 0} className={inputClass} />
-          </FormField>
-
           <label className="flex w-fit items-center gap-2 text-sm text-text">
             <input type="checkbox" name="is_active" defaultChecked={structure?.is_active ?? true} className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500" />
             เผยแพร่บนเว็บไซต์

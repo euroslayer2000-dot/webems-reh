@@ -36,18 +36,13 @@ export function BannerForm({ banner }: { banner: BannerRecord | null }) {
             <input id="link_url" name="link_url" defaultValue={banner?.link_url ?? ""} className={inputClass} />
           </FormField>
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <FormField label="ตำแหน่ง" htmlFor="position">
-              <select id="position" name="position" defaultValue={banner?.position ?? "hero"} className={inputClass}>
-                <option value="hero">Hero (หน้าแรก)</option>
-                <option value="sidebar">Sidebar</option>
-                <option value="popup">Popup</option>
-              </select>
-            </FormField>
-            <FormField label="ลำดับการแสดงผล" htmlFor="sort_order">
-              <input id="sort_order" name="sort_order" type="number" defaultValue={banner?.sort_order ?? 0} className={inputClass} />
-            </FormField>
-          </div>
+          <FormField label="ตำแหน่ง" htmlFor="position">
+            <select id="position" name="position" defaultValue={banner?.position ?? "hero"} className={`${inputClass} sm:w-56`}>
+              <option value="hero">Hero (หน้าแรก)</option>
+              <option value="sidebar">Sidebar</option>
+              <option value="popup">Popup</option>
+            </select>
+          </FormField>
 
           <label className="flex w-fit items-center gap-2 text-sm text-text">
             <input type="checkbox" name="is_active" defaultChecked={banner?.is_active ?? true} className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500" />

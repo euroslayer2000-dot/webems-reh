@@ -27,10 +27,6 @@ export function EquipmentCategoryForm({ category }: { category: CategoryRecord |
             </FormField>
           </div>
 
-          <FormField label="ลำดับการแสดงผล" htmlFor="sort_order">
-            <input id="sort_order" name="sort_order" type="number" defaultValue={category?.sort_order ?? 0} className={inputClass} />
-          </FormField>
-
           <FormActions isPending={isPending} cancelHref="/admin/equipment-category" />
         </form>
       </AdminCardBody>

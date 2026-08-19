@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requirePageAccess } from "@/lib/admin-auth";
 import { uploadUrl } from "@/lib/upload";
@@ -9,7 +9,7 @@ import { PageHead } from "@/components/admin/page-head";
 import { AdminCard } from "@/components/admin/admin-card";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { btnDangerSm, btnGhostSm, btnPrimary } from "@/components/admin/button-styles";
-import { deletePersonnel, togglePersonnel } from "./actions";
+import { deletePersonnel, movePersonnel, togglePersonnel } from "./actions";
 
 export default async function AdminPersonnelPage() {
   await requirePageAccess("personnel");
@@ -38,7 +38,7 @@ export default async function AdminPersonnelPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {personnel.map((person) => (
+            {personnel.map((person, i) => (
               <tr key={person.id}>
                 <td className="px-5 py-2.5">
                   <div className="relative h-10 w-10 overflow-hidden rounded-full bg-bg-soft">
@@ -52,6 +52,20 @@ export default async function AdminPersonnelPage() {
                 </td>
                 <td className="px-5 py-2.5">
                   <div className="flex justify-end gap-1.5">
+                    <form action={movePersonnel}>
+                      <input type="hidden" name="id" value={person.id} />
+                      <input type="hidden" name="direction" value="up" />
+                      <button type="submit" disabled={i === 0} aria-label="เลื่อนขึ้น" className={`${btnGhostSm} disabled:opacity-30`}>
+                        <ChevronUp size={15} />
+                      </button>
+                    </form>
+                    <form action={movePersonnel}>
+                      <input type="hidden" name="id" value={person.id} />
+                      <input type="hidden" name="direction" value="down" />
+                      <button type="submit" disabled={i === personnel.length - 1} aria-label="เลื่อนลง" className={`${btnGhostSm} disabled:opacity-30`}>
+                        <ChevronDown size={15} />
+                      </button>
+                    </form>
                     <form action={togglePersonnel}>
                       <input type="hidden" name="id" value={person.id} />
                       <button type="submit" className={btnGhostSm}>

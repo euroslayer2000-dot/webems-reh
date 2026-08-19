@@ -13,7 +13,6 @@ const personnelSchema = z
     last_name: z.string().min(1, "กรุณากรอกนามสกุล").max(80),
     email: z.union([z.literal(""), z.string().email("อีเมลไม่ถูกต้อง").max(150, "อีเมลต้องไม่เกิน 150 ตัวอักษร")]).optional(),
     group_id: z.string().optional(),
-    sort_order: z.string().optional(),
     bio: z.string().optional(),
   })
   .refine((data) => `${data.title ?? ""}${data.first_name} ${data.last_name}`.length <= 150, {
@@ -33,7 +32,6 @@ function parse(formData: FormData) {
     last_name: formData.get("last_name"),
     email: formData.get("email") || undefined,
     group_id: formData.get("group_id") || undefined,
-    sort_order: formData.get("sort_order") || undefined,
     bio: formData.get("bio") || undefined,
   });
 }
@@ -56,7 +54,6 @@ function buildData(parsed: z.infer<typeof personnelSchema>) {
     full_name: fullName,
     email: parsed.email || null,
     bio: parsed.bio || null,
-    sort_order: parsed.sort_order ? Number(parsed.sort_order) : 0,
   };
 }
 
@@ -68,8 +65,10 @@ export async function createPersonnel(_prev: PersonnelFormState, formData: FormD
   const photo = formData.get("photo");
   const photoPath = photo instanceof File && photo.size > 0 ? await saveUpload(photo, "personnel") : null;
 
+  const count = await prisma.personnel.count();
+
   await prisma.personnel.create({
-    data: { ...buildData(parsed.data), is_active: formData.get("is_active") === "on", photo: photoPath },
+    data: { ...buildData(parsed.data), sort_order: count, is_active: formData.get("is_active") === "on", photo: photoPath },
   });
 
   redirectWithFlash("/admin/personnel", "เพิ่มบุคลากรเรียบร้อยแล้ว");
@@ -95,6 +94,25 @@ export async function updatePersonnel(id: number, _prev: PersonnelFormState, for
   });
 
   redirectWithFlash("/admin/personnel", "บันทึกการแก้ไขเรียบร้อยแล้ว");
+}
+
+export async function movePersonnel(formData: FormData): Promise<void> {
+  await requireActionAccess("personnel");
+  const id = Number(formData.get("id"));
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+
+  const siblings = await prisma.personnel.findMany({ orderBy: [{ sort_order: "asc" }, { id: "asc" }] });
+  const index = siblings.findIndex((p) => p.id === id);
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith >= 0 && swapWith < siblings.length) {
+    const reordered = [...siblings];
+    [reordered[index], reordered[swapWith]] = [reordered[swapWith], reordered[index]];
+    await prisma.$transaction(
+      reordered.map((item, i) => prisma.personnel.update({ where: { id: item.id }, data: { sort_order: i } }))
+    );
+  }
+
+  redirectWithFlash("/admin/personnel", "จัดลำดับใหม่เรียบร้อยแล้ว");
 }
 
 export async function togglePersonnel(formData: FormData): Promise<void> {

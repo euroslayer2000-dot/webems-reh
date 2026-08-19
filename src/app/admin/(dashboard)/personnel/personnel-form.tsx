@@ -48,17 +48,12 @@ export function PersonnelForm({ groups, person }: { groups: Group[]; person: Per
             </FormField>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <FormField label="กลุ่มบุคลากร" htmlFor="group_id">
-              <select id="group_id" name="group_id" defaultValue={person?.group_id ?? ""} className={inputClass}>
-                <option value="">ไม่ระบุ</option>
-                {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-              </select>
-            </FormField>
-            <FormField label="ลำดับการแสดงผล" htmlFor="sort_order">
-              <input id="sort_order" name="sort_order" type="number" defaultValue={person?.sort_order ?? 0} className={inputClass} />
-            </FormField>
-          </div>
+          <FormField label="กลุ่มบุคลากร" htmlFor="group_id">
+            <select id="group_id" name="group_id" defaultValue={person?.group_id ?? ""} className={`${inputClass} sm:w-64`}>
+              <option value="">ไม่ระบุ</option>
+              {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          </FormField>
 
           <FormField label="อีเมล" htmlFor="email" error={state.errors?.email}>
             <input id="email" name="email" type="email" defaultValue={person?.email ?? ""} className={inputClass} />
