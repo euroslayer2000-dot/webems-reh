@@ -65,7 +65,7 @@ export async function createStation(_prev: StationFormState, formData: FormData)
   const photo = formData.get("photo");
   const photoPath = photo instanceof File && photo.size > 0 ? await saveUpload(photo, "stations") : null;
 
-  const count = await prisma.station.count();
+  const count = await prisma.station.count({ where: { type: parsed.data.type } });
 
   await prisma.station.create({ data: { ...buildData(parsed.data), sort_order: count, is_active: formData.get("is_active") === "on", photo: photoPath } });
 
@@ -96,7 +96,11 @@ export async function moveStation(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   const direction = formData.get("direction") === "up" ? "up" : "down";
 
-  const siblings = await prisma.station.findMany({ orderBy: [{ sort_order: "asc" }, { id: "asc" }] });
+  const current = await prisma.station.findUniqueOrThrow({ where: { id } });
+  const siblings = await prisma.station.findMany({
+    where: { type: current.type },
+    orderBy: [{ sort_order: "asc" }, { id: "asc" }],
+  });
   const index = siblings.findIndex((s) => s.id === id);
   const swapWith = direction === "up" ? index - 1 : index + 1;
   if (swapWith >= 0 && swapWith < siblings.length) {
