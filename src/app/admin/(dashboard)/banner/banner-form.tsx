@@ -6,13 +6,12 @@ import { FormActions } from "@/components/admin/form-actions";
 import { AdminCard, AdminCardBody } from "@/components/admin/admin-card";
 import { ImageFileField } from "@/components/admin/image-file-field";
 import { uploadUrl } from "@/lib/upload";
-import { createBanner, updateBanner, type BannerFormState } from "./actions";
+import { updateBanner, type BannerFormState } from "./actions";
 
 type BannerRecord = {
   id: number;
   title: string | null;
   link_url: string | null;
-  position: string;
   sort_order: number;
   is_active: boolean;
   image: string;
@@ -20,32 +19,25 @@ type BannerRecord = {
 
 const initialState: BannerFormState = { ok: false };
 
-export function BannerForm({ banner }: { banner: BannerRecord | null }) {
-  const action = banner ? updateBanner.bind(null, banner.id) : createBanner;
+export function BannerForm({ banner }: { banner: BannerRecord }) {
+  const action = updateBanner.bind(null, banner.id);
   const [state, formAction, isPending] = useActionState(action, initialState);
 
   return (
     <AdminCard>
       <AdminCardBody>
         <form action={formAction} className="grid gap-5">
-          <FormField label="ชื่อแบนเนอร์" htmlFor="title">
-            <input id="title" name="title" defaultValue={banner?.title ?? ""} className={inputClass} />
+          <FormField label="รายละเอียดรูปภาพ" htmlFor="title">
+            <input id="title" name="title" defaultValue={banner.title ?? ""} className={inputClass} placeholder="เช่น รูปทีมกู้ชีพปฏิบัติการ" />
+            <p className="mt-1 text-xs text-text-muted">ใส่ไว้เพื่อให้ทราบว่ารูปนี้คือรูปอะไร จะได้แก้ไขได้ง่ายภายหลัง</p>
           </FormField>
 
-          <FormField label="ลิงก์ปลายทาง" htmlFor="link_url">
-            <input id="link_url" name="link_url" defaultValue={banner?.link_url ?? ""} className={inputClass} />
-          </FormField>
-
-          <FormField label="ตำแหน่ง" htmlFor="position">
-            <select id="position" name="position" defaultValue={banner?.position ?? "hero"} className={`${inputClass} sm:w-56`}>
-              <option value="hero">Hero (หน้าแรก)</option>
-              <option value="sidebar">Sidebar</option>
-              <option value="popup">Popup</option>
-            </select>
+          <FormField label="ลิงก์ปลายทาง (ถ้ามี)" htmlFor="link_url">
+            <input id="link_url" name="link_url" defaultValue={banner.link_url ?? ""} className={inputClass} />
           </FormField>
 
           <label className="flex w-fit items-center gap-2 text-sm text-text">
-            <input type="checkbox" name="is_active" defaultChecked={banner?.is_active ?? true} className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500" />
+            <input type="checkbox" name="is_active" defaultChecked={banner.is_active} className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500" />
             เผยแพร่บนเว็บไซต์
           </label>
 
@@ -53,9 +45,8 @@ export function BannerForm({ banner }: { banner: BannerRecord | null }) {
             label="รูปภาพ"
             id="image"
             name="image"
-            required={!banner}
             error={state.errors?.image}
-            currentImageUrl={banner ? uploadUrl(banner.image) : null}
+            currentImageUrl={uploadUrl(banner.image)}
           />
 
           <FormActions isPending={isPending} cancelHref="/admin/banner" />

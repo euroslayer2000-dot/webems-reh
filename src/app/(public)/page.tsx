@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Award,
   BadgeCheck,
-  CheckCircle2,
   Download,
   FileDown,
   HeartPulse,
@@ -12,8 +11,6 @@ import {
   Newspaper,
   Phone,
   PhoneCall,
-  PhoneIncoming,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -58,8 +55,6 @@ export default async function HomePage() {
     }),
   ]);
 
-  const siteName = settings.site_name || "หน่วยกู้ชีพและการแพทย์ฉุกเฉิน REH101";
-  const tagline = settings.site_tagline || "บริการการแพทย์ฉุกเฉิน ด้วยหัวใจ ตลอด 24 ชั่วโมง พร้อมทีมกู้ชีพมืออาชีพ";
   const emergencyPhone = settings.emergency_phone || "1669";
 
   const stats = [
@@ -78,81 +73,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* ---------------------------------------------------------- Hero --- */}
-      <section className="relative overflow-hidden bg-[image:var(--grad-hero)] text-white">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 15% 25%, rgba(255,255,255,0.14), transparent 40%), radial-gradient(circle at 85% 75%, rgba(255,107,157,0.28), transparent 45%)",
-          }}
-        />
-        <span className="pointer-events-none absolute -top-20 -right-15 h-[340px] w-[340px] animate-[float_9s_ease-in-out_infinite] rounded-full bg-accent-500 opacity-50 blur-[60px]" />
-        <span className="pointer-events-none absolute -bottom-20 -left-10 h-[260px] w-[260px] animate-[float_11s_ease-in-out_infinite_reverse] rounded-full bg-primary-300 opacity-50 blur-[60px]" />
-
-        <Container className="relative z-[2] py-[clamp(3.5rem,8vw,7rem)]">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <Reveal direction="right">
-              <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/16 px-4 py-2 text-sm font-semibold backdrop-blur-md">
-                <ShieldCheck size={16} /> หน่วยบริการการแพทย์ฉุกเฉินที่ได้มาตรฐาน
-              </span>
-              <h1 className="text-[clamp(2rem,5vw,3.4rem)] leading-[1.15] font-extrabold">{siteName}</h1>
-              <p className="mt-4 max-w-[560px] text-[clamp(1rem,2vw,1.2rem)] text-white/94">{tagline}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href={`tel:${emergencyPhone}`}
-                  className="inline-flex items-center rounded-[var(--radius)] bg-[image:var(--grad-accent)] px-6 py-3.5 text-base font-bold shadow-[var(--shadow-accent)] transition-transform hover:-translate-y-0.5"
-                >
-                  <Phone size={18} className="mr-2" /> โทรฉุกเฉิน {emergencyPhone}
-                </a>
-                <Link
-                  href="/news"
-                  className="inline-flex items-center rounded-[var(--radius)] border-[1.5px] border-white/50 bg-white/14 px-6 py-3.5 text-base font-bold backdrop-blur-md transition-colors hover:bg-white/25"
-                >
-                  <Newspaper size={18} className="mr-2" /> ข่าวสารล่าสุด
-                </Link>
-              </div>
-            </Reveal>
-
-            <Reveal
-              direction="left"
-              className="rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 text-text shadow-[var(--shadow-lg)] backdrop-blur-[14px] transition-transform hover:-translate-y-1"
-            >
-              <div className="mb-3 flex items-center gap-3">
-                <div className="grid h-[66px] w-[66px] shrink-0 place-items-center rounded-[20px] bg-[image:var(--grad-primary)] text-2xl text-white shadow-[var(--shadow-primary)]">
-                  <PhoneIncoming size={28} />
-                </div>
-                <div>
-                  <div className="text-sm text-text-muted">สายด่วนการแพทย์ฉุกเฉิน</div>
-                  <div className="bg-[image:var(--grad-accent)] bg-clip-text text-[3.2rem] leading-none font-extrabold text-transparent">
-                    {emergencyPhone}
-                  </div>
-                </div>
-              </div>
-              <hr className="my-4 border-border" />
-              <ul className="grid gap-2">
-                <li className="flex items-start gap-2"><CheckCircle2 size={18} className="mt-0.5 shrink-0 text-primary-500" />ทีมกู้ชีพพร้อมออกปฏิบัติการทันที</li>
-                <li className="flex items-start gap-2"><CheckCircle2 size={18} className="mt-0.5 shrink-0 text-primary-500" />รถพยาบาลอุปกรณ์ครบครัน</li>
-                <li className="flex items-start gap-2"><CheckCircle2 size={18} className="mt-0.5 shrink-0 text-primary-500" />บุคลากรผ่านการอบรมมาตรฐาน EMT/Paramedic</li>
-              </ul>
-            </Reveal>
-          </div>
-        </Container>
-
-        <div className="relative z-[2] mt-8 leading-[0]">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="block h-[60px] w-full">
-            <path d="M0,30 C360,80 1080,-20 1440,30 L1440,60 L0,60 Z" fill="var(--color-bg)" />
-          </svg>
-        </div>
-      </section>
-
-      {heroBanners.length > 0 && (
-        <section className="py-12">
-          <Container>
-            <HeroBannerCarousel banners={heroBanners} />
-          </Container>
-        </section>
-      )}
+      {heroBanners.length > 0 && <HeroBannerCarousel banners={heroBanners} />}
 
       {/* ---------------------------------------------------- Stats strip --- */}
       <section className="bg-[image:var(--grad-soft)] py-12">

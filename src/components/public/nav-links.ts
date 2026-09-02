@@ -10,7 +10,7 @@ export const NAV_LINKS: NavLink[] = [
     label: "เกี่ยวกับเรา",
     href: "/about/vision",
     children: [
-      { label: "วิสัยทัศน์และพันธกิจ", href: "/about/vision" },
+      { label: "วิสัยทัศน์", href: "/about/vision" },
       { label: "โครงสร้างองค์กร", href: "/personnel/structure" },
       { label: "ประวัติความเป็นมา", href: "/about/history" },
     ],

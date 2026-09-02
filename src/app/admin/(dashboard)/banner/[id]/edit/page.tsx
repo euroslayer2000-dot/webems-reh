@@ -12,7 +12,7 @@ export default async function EditBannerPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <PageHead title="แก้ไขแบนเนอร์" />
+      <PageHead title="แก้ไขรูปภาพหน้าหลัก" />
       <BannerForm banner={banner} />
     </div>
   );

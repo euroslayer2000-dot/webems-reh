@@ -55,7 +55,7 @@ export const NAV_CONTENT: NavEntry[] = [
       { module: "notification", label: "การแจ้งเตือน", href: "/admin/notification", icon: Bell, badge: "notification" },
     ],
   },
-  { module: "banner", label: "แบนเนอร์", href: "/admin/banner", icon: Images },
+  { module: "banner", label: "เพิ่มรูปภาพหน้าหลัก", href: "/admin/banner", icon: Images },
 ];
 
 export const NAV_SYSTEM: NavLeaf[] = [
