@@ -23,7 +23,7 @@ export function HeroBannerCarousel({ banners }: { banners: HeroBanner[] }) {
 
   return (
     <section className="relative">
-      <div className="relative mx-auto aspect-[1390/750] w-full max-w-[1390px] overflow-hidden bg-white">
+      <div className="relative mx-auto aspect-[1390/750] w-full max-w-[1390px] overflow-hidden rounded-[var(--radius-lg)] bg-surface">
         {banners.map((banner, i) => {
           const content = (
             <div className="relative h-full w-full">
