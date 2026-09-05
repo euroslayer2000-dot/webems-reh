@@ -17,7 +17,6 @@ import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/public/container";
 import { SectionTitle } from "@/components/public/section-title";
 import { NewsCard } from "@/components/public/news-card";
-import { PersonnelCard } from "@/components/public/personnel-card";
 import { getSettings } from "@/lib/settings";
 import { uploadUrl } from "@/lib/upload";
 import { Reveal } from "@/components/public/reveal";
@@ -26,19 +25,13 @@ import { HeroBannerCarousel } from "@/components/public/hero-banner-carousel";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [settings, latestNews, personnel, galleries, newsCount, personnelCount, downloadSum, heroBanners] = await Promise.all([
+  const [settings, latestNews, galleries, newsCount, personnelCount, downloadSum, heroBanners] = await Promise.all([
     getSettings(),
     prisma.news.findMany({
       where: { status: "published" },
       include: { category: true },
       orderBy: { published_at: "desc" },
       take: 6,
-    }),
-    prisma.personnel.findMany({
-      where: { is_active: true },
-      include: { group: true },
-      orderBy: { sort_order: "asc" },
-      take: 4,
     }),
     prisma.gallery.findMany({
       include: { _count: { select: { images: true } } },
@@ -199,30 +192,6 @@ export default async function HomePage() {
           </div>
         </Container>
       </section>
-
-      {/* ------------------------------------------------------ Personnel --- */}
-      {personnel.length > 0 && (
-        <section className="py-[4.5rem]">
-          <Container>
-            <Reveal direction="up"><SectionTitle eyebrow="Our Team" title="ทีมบุคลากรของเรา" /></Reveal>
-            <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-              {personnel.map((person, i) => (
-                <Reveal key={person.id} direction="zoom" delay={(i % 4) * 100}>
-                  <PersonnelCard person={person} />
-                </Reveal>
-              ))}
-            </div>
-            <Reveal direction="up" className="mt-8 text-center">
-              <Link
-                href="/personnel"
-                className="inline-flex items-center rounded-[var(--radius)] border border-border bg-surface px-6 py-2.5 text-sm font-semibold text-text shadow-[var(--shadow-sm)] transition-colors hover:border-primary-500 hover:text-primary-500"
-              >
-                ดูบุคลากรทั้งหมด <ArrowRight size={16} className="ml-1.5" />
-              </Link>
-            </Reveal>
-          </Container>
-        </section>
-      )}
 
       {/* -------------------------------------------------------- Gallery --- */}
       {galleries.length > 0 && (

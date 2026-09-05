@@ -23,14 +23,6 @@ export const NAV_LINKS: NavLink[] = [
       { label: "แกลเลอรี", href: "/gallery" },
     ],
   },
-  {
-    label: "บุคลากร",
-    href: "/personnel",
-    children: [
-      { label: "โครงสร้างหน่วยงาน", href: "/personnel/structure" },
-      { label: "ทำเนียบบุคลากร", href: "/personnel" },
-    ],
-  },
   { label: "แผนที่หน่วย", href: "/stations" },
   { label: "ดาวน์โหลด", href: "/download" },
   { label: "ติดต่อ", href: "/contact" },
