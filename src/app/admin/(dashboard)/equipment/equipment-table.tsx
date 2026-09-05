@@ -120,7 +120,7 @@ export function EquipmentTable({ items, baseUrl }: { items: EquipmentRow[]; base
 
   const selectedItems = items
     .filter((item) => selected.has(item.id))
-    .map((item) => ({ code: item.code, name: item.name, location: item.location, url: `${baseUrl}/equipment/show/${item.code}` }));
+    .map((item) => ({ code: item.code, name: item.name, location: item.location, url: `${baseUrl}/equipment/show/${encodeURIComponent(item.code)}` }));
 
   return (
     <>
@@ -199,7 +199,7 @@ export function EquipmentTable({ items, baseUrl }: { items: EquipmentRow[]; base
                   </td>
                   <td className="px-5 py-2.5">
                     <div className="flex justify-end gap-1.5">
-                      <EquipmentQrButton code={item.code} name={item.name} location={item.location} url={`${baseUrl}/equipment/show/${item.code}`} />
+                      <EquipmentQrButton code={item.code} name={item.name} location={item.location} url={`${baseUrl}/equipment/show/${encodeURIComponent(item.code)}`} />
                       <EquipmentDetailButton item={item} />
                       <Link href={`/admin/equipment/${item.id}/edit`} className={btnGhostSm}>แก้ไข</Link>
                       <form action={deleteEquipment}>
