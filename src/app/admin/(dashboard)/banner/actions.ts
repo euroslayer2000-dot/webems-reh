@@ -59,7 +59,6 @@ export async function updateBanner(id: number, _prev: BannerFormState, formData:
   const image = formData.get("image");
   let imagePath = existing.image;
   if (image instanceof File && image.size > 0) {
-    await deleteUpload(existing.image);
     imagePath = await saveUpload(image, "banners");
   }
 
@@ -72,6 +71,7 @@ export async function updateBanner(id: number, _prev: BannerFormState, formData:
       image: imagePath,
     },
   });
+  if (imagePath !== existing.image) await deleteUpload(existing.image);
 
   redirectWithFlash("/admin/banner", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

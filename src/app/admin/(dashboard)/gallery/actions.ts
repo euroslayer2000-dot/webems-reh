@@ -63,7 +63,6 @@ export async function updateGallery(id: number, _prev: GalleryFormState, formDat
   const coverImage = formData.get("cover_image");
   let coverImagePath = existing.cover_image;
   if (coverImage instanceof File && coverImage.size > 0) {
-    await deleteUpload(existing.cover_image);
     coverImagePath = await saveUpload(coverImage, "gallery");
   }
 
@@ -71,6 +70,7 @@ export async function updateGallery(id: number, _prev: GalleryFormState, formDat
     where: { id },
     data: { title: parsed.data.title, slug, description: parsed.data.description || null, cover_image: coverImagePath },
   });
+  if (coverImagePath !== existing.cover_image) await deleteUpload(existing.cover_image);
 
   redirectWithFlash(`/admin/gallery/${id}/edit`, "บันทึกอัลบั้มเรียบร้อยแล้ว");
 }

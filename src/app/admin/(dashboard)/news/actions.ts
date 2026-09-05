@@ -89,7 +89,6 @@ export async function updateNews(id: number, _prev: NewsFormState, formData: For
   const coverImage = formData.get("cover_image");
   let coverImagePath = existing.cover_image;
   if (coverImage instanceof File && coverImage.size > 0) {
-    await deleteUpload(existing.cover_image);
     coverImagePath = await saveUpload(coverImage, "news");
   }
 
@@ -106,6 +105,7 @@ export async function updateNews(id: number, _prev: NewsFormState, formData: For
       cover_image: coverImagePath,
     },
   });
+  if (coverImagePath !== existing.cover_image) await deleteUpload(existing.cover_image);
 
   redirectWithFlash("/admin/news", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

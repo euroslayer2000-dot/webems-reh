@@ -45,7 +45,6 @@ export async function updateStructure(id: number, _prev: StructureFormState, for
   const image = formData.get("image");
   let imagePath = existing.image;
   if (image instanceof File && image.size > 0) {
-    await deleteUpload(existing.image);
     imagePath = await saveUpload(image, "org-structure");
   }
 
@@ -57,6 +56,7 @@ export async function updateStructure(id: number, _prev: StructureFormState, for
       image: imagePath,
     },
   });
+  if (imagePath !== existing.image) await deleteUpload(existing.image);
 
   redirectWithFlash("/admin/structure", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

@@ -20,6 +20,13 @@ export async function saveUpload(file: File, folder: string): Promise<string> {
   const ext = path.extname(file.name).toLowerCase();
   const filename = `${Date.now()}_${randomBytes(8).toString("hex")}${ext}`;
 
+  // On Vercel there's no writable filesystem outside /tmp — if the Blob
+  // token is ever missing there, fail clearly instead of attempting (and
+  // silently corrupting) a local-fallback write that can't actually persist.
+  if (process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error("Cannot save upload: BLOB_READ_WRITE_TOKEN is not set in this Vercel environment");
+  }
+
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const blob = await put(`${folder}/${filename}`, file, {
       access: "public",

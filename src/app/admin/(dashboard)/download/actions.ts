@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { requireActionAccess } from "@/lib/admin-auth";
 import { deleteUpload, saveUpload } from "@/lib/uploads-write";
 import { redirectWithFlash } from "@/lib/flash-redirect";
+import { MAX_UPLOAD_SIZE_MB } from "@/lib/upload";
 
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "xls", "xlsx"];
-const MAX_SIZE = 20 * 1024 * 1024;
+const MAX_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024;
 
 const downloadSchema = z.object({
   title: z.string().min(1, "กรุณากรอกชื่อเอกสาร").max(255),
@@ -24,7 +25,7 @@ function fileExt(name: string): string {
 function validateFile(file: File | null): string | null {
   if (!file || file.size === 0) return null;
   if (!ALLOWED_EXTENSIONS.includes(fileExt(file.name))) return "รองรับเฉพาะไฟล์ pdf, doc, docx, xls, xlsx";
-  if (file.size > MAX_SIZE) return "ขนาดไฟล์ต้องไม่เกิน 20MB";
+  if (file.size > MAX_SIZE) return `ขนาดไฟล์ต้องไม่เกิน ${MAX_UPLOAD_SIZE_MB}MB`;
   return null;
 }
 
@@ -87,13 +88,13 @@ export async function updateDownload(id: number, _prev: DownloadFormState, formD
   };
 
   if (file && file.size > 0) {
-    await deleteUpload(existing.file_path);
     data.file_path = await saveUpload(file, "documents");
     data.file_type = fileExt(file.name);
     data.file_size = file.size;
   }
 
   await prisma.download.update({ where: { id }, data });
+  if (data.file_path) await deleteUpload(existing.file_path);
 
   redirectWithFlash("/admin/download", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

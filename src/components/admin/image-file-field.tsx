@@ -1,12 +1,8 @@
 "use client";
 
 import { useEffect, useState, type ChangeEvent } from "react";
+import { MAX_UPLOAD_SIZE_MB } from "@/lib/upload";
 import { FormField, inputClass } from "./form-field";
-
-// Vercel's serverless functions reject request bodies over ~4.5MB before our
-// server action code ever runs, regardless of next.config.ts's bodySizeLimit —
-// so oversized files must be caught here, client-side, with a clear message.
-const MAX_SIZE_MB = 4;
 
 export function ImageFileField({
   label,
@@ -37,9 +33,9 @@ export function ImageFileField({
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
-    if (file && file.size > MAX_SIZE_MB * 1024 * 1024) {
+    if (file && file.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024) {
       setSizeError(
-        `ไฟล์รูปภาพขนาด ${(file.size / 1024 / 1024).toFixed(1)}MB ใหญ่เกินไป กรุณาเลือกไฟล์ไม่เกิน ${MAX_SIZE_MB}MB (ลองบีบอัดหรือลดขนาดรูปก่อนอัปโหลด)`
+        `ไฟล์รูปภาพขนาด ${(file.size / 1024 / 1024).toFixed(1)}MB ใหญ่เกินไป กรุณาเลือกไฟล์ไม่เกิน ${MAX_UPLOAD_SIZE_MB}MB (ลองบีบอัดหรือลดขนาดรูปก่อนอัปโหลด)`
       );
       e.target.value = "";
       setPreview((prev) => {

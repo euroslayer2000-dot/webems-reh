@@ -82,11 +82,11 @@ export async function updateStation(id: number, _prev: StationFormState, formDat
   const photo = formData.get("photo");
   let photoPath = existing.photo;
   if (photo instanceof File && photo.size > 0) {
-    await deleteUpload(existing.photo);
     photoPath = await saveUpload(photo, "stations");
   }
 
   await prisma.station.update({ where: { id }, data: { ...buildData(parsed.data), is_active: formData.get("is_active") === "on", photo: photoPath } });
+  if (photoPath !== existing.photo) await deleteUpload(existing.photo);
 
   redirectWithFlash("/admin/station", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

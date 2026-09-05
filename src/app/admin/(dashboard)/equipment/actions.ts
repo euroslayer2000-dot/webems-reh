@@ -63,11 +63,13 @@ function buildData(parsed: z.infer<typeof equipmentSchema>) {
   };
 }
 
-/** Saves a single named file field if present, deleting the previous upload on replace. */
-async function handleImageField(formData: FormData, field: string, existingPath: string | null): Promise<string | null> {
+/** Saves a single named file field if present, else keeps the existing path.
+ * Does NOT delete the old upload — that happens only after the DB row is
+ * updated to point at the new one, so a failed save/update never leaves the
+ * row referencing a file that's already gone. */
+async function resolveImageField(formData: FormData, field: string, existingPath: string | null): Promise<string | null> {
   const file = formData.get(field);
   if (!(file instanceof File) || file.size === 0) return existingPath;
-  if (existingPath) await deleteUpload(existingPath);
   return saveUpload(file, "equipment");
 }
 
@@ -79,11 +81,11 @@ export async function createEquipment(_prev: EquipmentFormState, formData: FormD
   const dup = await prisma.equipment.findUnique({ where: { code: parsed.data.code } });
   if (dup) return { ok: false, errors: { code: "เลขครุภัณฑ์นี้ถูกใช้แล้ว" } };
 
-  const photo = await handleImageField(formData, "photo", null);
-  const photo2 = await handleImageField(formData, "photo2", null);
-  const photo3 = await handleImageField(formData, "photo3", null);
-  const warranty_document = await handleImageField(formData, "warranty_document", null);
-  const receipt_document = await handleImageField(formData, "receipt_document", null);
+  const photo = await resolveImageField(formData, "photo", null);
+  const photo2 = await resolveImageField(formData, "photo2", null);
+  const photo3 = await resolveImageField(formData, "photo3", null);
+  const warranty_document = await resolveImageField(formData, "warranty_document", null);
+  const receipt_document = await resolveImageField(formData, "receipt_document", null);
 
   const created = await prisma.equipment.create({
     data: { ...buildData(parsed.data), photo, photo2, photo3, warranty_document, receipt_document },
@@ -103,17 +105,26 @@ export async function updateEquipment(id: number, _prev: EquipmentFormState, for
   const dup = await prisma.equipment.findFirst({ where: { code: parsed.data.code, id: { not: id } } });
   if (dup) return { ok: false, errors: { code: "เลขครุภัณฑ์นี้ถูกใช้แล้ว" } };
 
-  const photo = await handleImageField(formData, "photo", existing.photo);
-  const photo2 = await handleImageField(formData, "photo2", existing.photo2);
-  const photo3 = await handleImageField(formData, "photo3", existing.photo3);
-  const warranty_document = await handleImageField(formData, "warranty_document", existing.warranty_document);
-  const receipt_document = await handleImageField(formData, "receipt_document", existing.receipt_document);
+  const photo = await resolveImageField(formData, "photo", existing.photo);
+  const photo2 = await resolveImageField(formData, "photo2", existing.photo2);
+  const photo3 = await resolveImageField(formData, "photo3", existing.photo3);
+  const warranty_document = await resolveImageField(formData, "warranty_document", existing.warranty_document);
+  const receipt_document = await resolveImageField(formData, "receipt_document", existing.receipt_document);
 
   await prisma.equipment.update({
     where: { id },
     data: { ...buildData(parsed.data), photo, photo2, photo3, warranty_document, receipt_document },
   });
   await logStatusChange(id, existing.status, parsed.data.status);
+
+  // Only now that the row points at the new files is it safe to delete the
+  // old ones — deleting them earlier risks a broken reference if the save
+  // or update above had failed partway through.
+  if (photo !== existing.photo) await deleteUpload(existing.photo);
+  if (photo2 !== existing.photo2) await deleteUpload(existing.photo2);
+  if (photo3 !== existing.photo3) await deleteUpload(existing.photo3);
+  if (warranty_document !== existing.warranty_document) await deleteUpload(existing.warranty_document);
+  if (receipt_document !== existing.receipt_document) await deleteUpload(existing.receipt_document);
 
   redirectWithFlash("/admin/equipment", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }

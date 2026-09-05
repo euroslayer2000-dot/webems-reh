@@ -84,7 +84,6 @@ export async function updatePersonnel(id: number, _prev: PersonnelFormState, for
   const photo = formData.get("photo");
   let photoPath = existing.photo;
   if (photo instanceof File && photo.size > 0) {
-    await deleteUpload(existing.photo);
     photoPath = await saveUpload(photo, "personnel");
   }
 
@@ -92,6 +91,7 @@ export async function updatePersonnel(id: number, _prev: PersonnelFormState, for
     where: { id },
     data: { ...buildData(parsed.data), is_active: formData.get("is_active") === "on", photo: photoPath },
   });
+  if (photoPath !== existing.photo) await deleteUpload(existing.photo);
 
   redirectWithFlash("/admin/personnel", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }
