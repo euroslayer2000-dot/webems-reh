@@ -8,7 +8,10 @@ import { EQUIPMENT_STATUS_META } from "@/lib/equipment-status";
 import { EquipmentPhotoGallery } from "@/components/public/equipment-photo-gallery";
 
 async function getItem(code: string) {
-  return prisma.equipment.findUnique({ where: { code }, include: { category: true } });
+  // Next.js doesn't decode a literal %2F within a dynamic segment (to avoid
+  // ambiguity with path separators), so a code containing "/" — the Thai
+  // government asset-numbering format — arrives here still percent-encoded.
+  return prisma.equipment.findUnique({ where: { code: decodeURIComponent(code) }, include: { category: true } });
 }
 
 export async function generateMetadata({
