@@ -23,6 +23,7 @@ export const NAV_LINKS: NavLink[] = [
       { label: "แกลเลอรี", href: "/gallery" },
     ],
   },
+  { label: "หลักสูตรการเรียน", href: "/courses" },
   { label: "แผนที่หน่วย", href: "/stations" },
   { label: "ดาวน์โหลด", href: "/download" },
   { label: "ติดต่อ", href: "/contact" },

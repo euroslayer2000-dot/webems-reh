@@ -15,6 +15,8 @@ export const modulePermissions: Record<string, Role[]> = {
   structure: ["superadmin", "admin", "editor"],
   station: ["superadmin", "admin", "editor"],
   gallery: ["superadmin", "admin", "editor"],
+  course: ["superadmin", "admin", "editor"],
+  patientreport: ["superadmin", "admin", "editor"],
   download: ["superadmin", "admin", "editor"],
   banner: ["superadmin", "admin", "editor"],
   equipment: ["superadmin", "admin", "editor"],

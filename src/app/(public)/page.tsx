@@ -2,13 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  Award,
   BadgeCheck,
-  Download,
   FileDown,
   HeartPulse,
   MessageCircle,
-  Newspaper,
   Phone,
   PhoneCall,
   Users,
@@ -21,40 +18,54 @@ import { getSettings } from "@/lib/settings";
 import { uploadUrl } from "@/lib/upload";
 import { Reveal } from "@/components/public/reveal";
 import { HeroBannerCarousel } from "@/components/public/hero-banner-carousel";
+import { CourseHighlightCard } from "@/components/public/course-highlight-card";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [settings, latestNews, galleries, newsCount, personnelCount, downloadSum, heroBanners] = await Promise.all([
-    getSettings(),
-    prisma.news.findMany({
-      where: { status: "published" },
-      include: { category: true },
-      orderBy: { published_at: "desc" },
-      take: 6,
-    }),
-    prisma.gallery.findMany({
-      include: { _count: { select: { images: true } } },
-      orderBy: { id: "desc" },
-      take: 6,
-    }),
-    prisma.news.count({ where: { status: "published" } }),
-    prisma.personnel.count({ where: { is_active: true } }),
-    prisma.download.aggregate({ _sum: { download_count: true } }),
-    prisma.banner.findMany({
-      where: { position: "hero", is_active: true },
-      orderBy: { sort_order: "asc" },
-      select: { id: true, title: true, image: true, link_url: true },
-    }),
-  ]);
+  const currentYear = new Date().getFullYear();
+  const yearStart = new Date(Date.UTC(currentYear, 0, 1));
+  const yearEnd = new Date(Date.UTC(currentYear + 1, 0, 1));
+
+  const [settings, latestNews, galleries, patientStats, heroBanners, emrCourse, emtbCourse] =
+    await Promise.all([
+      getSettings(),
+      prisma.news.findMany({
+        where: { status: "published" },
+        include: { category: true },
+        orderBy: { published_at: "desc" },
+        take: 6,
+      }),
+      prisma.gallery.findMany({
+        include: { _count: { select: { images: true } } },
+        orderBy: { id: "desc" },
+        take: 6,
+      }),
+      prisma.patientReport.aggregate({
+        where: { report_date: { gte: yearStart, lt: yearEnd } },
+        _sum: {
+          patient_count: true,
+          emergency_count: true,
+          traffic_injury_count: true,
+          general_injury_count: true,
+        },
+      }),
+      prisma.banner.findMany({
+        where: { position: "hero", is_active: true },
+        orderBy: { sort_order: "asc" },
+        select: { id: true, title: true, image: true, link_url: true },
+      }),
+      prisma.course.findFirst({ where: { slug: "emr", is_active: true } }),
+      prisma.course.findFirst({ where: { slug: "emt-b", is_active: true } }),
+    ]);
 
   const emergencyPhone = settings.emergency_phone || "1669";
 
   const stats = [
-    { icon: Newspaper, label: "ข่าวประชาสัมพันธ์", value: newsCount },
-    { icon: Users, label: "บุคลากรผู้เชี่ยวชาญ", value: personnelCount },
-    { icon: Download, label: "ยอดดาวน์โหลดเอกสาร", value: downloadSum._sum.download_count ?? 0 },
-    { icon: Award, label: "ปีที่ให้บริการ", value: 12, suffix: "+" },
+    { icon: Users, label: "จำนวนผู้ป่วยต่อปี", value: patientStats._sum.patient_count ?? 0 },
+    { icon: Users, label: "จำนวนผู้ป่วยฉุกเฉิน", value: patientStats._sum.emergency_count ?? 0 },
+    { icon: Users, label: "จำนวนผู้บาดเจ็บจราจร", value: patientStats._sum.traffic_injury_count ?? 0 },
+    { icon: Users, label: "จำนวนผู้บาดเจ็บอุบัติเหตุทั่วไป", value: patientStats._sum.general_injury_count ?? 0 },
   ];
 
   const quickLinks = [
@@ -69,21 +80,14 @@ export default async function HomePage() {
       {heroBanners.length > 0 && <HeroBannerCarousel banners={heroBanners} />}
 
       {/* ---------------------------------------------------- Stats strip --- */}
-      <section className="bg-[image:var(--grad-soft)] py-12">
+      <section className="bg-surface py-12">
         <Container>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} direction="zoom" delay={i * 100} className="p-4 text-center">
-                <div
-                  className={`mx-auto mb-3.5 grid h-[66px] w-[66px] place-items-center rounded-[20px] text-2xl text-white shadow-[var(--shadow-primary)] transition-transform hover:-translate-y-1 ${
-                    i % 2 === 1 ? "bg-[image:var(--grad-accent)] shadow-[var(--shadow-accent)]" : "bg-[image:var(--grad-primary)]"
-                  }`}
-                >
-                  <stat.icon size={28} />
-                </div>
-                <div className="text-[2.4rem] leading-none font-extrabold text-text">
+                <stat.icon size={40} className="mx-auto mb-3 text-text" strokeWidth={1.75} />
+                <div className="text-[2.4rem] leading-none font-extrabold text-primary-600">
                   {stat.value.toLocaleString("th-TH")}
-                  {stat.suffix}
                 </div>
                 <div className="mt-1.5 font-medium text-text-muted">{stat.label}</div>
               </Reveal>
@@ -141,6 +145,37 @@ export default async function HomePage() {
           ) : (
             <p className="py-8 text-center text-text-muted">ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</p>
           )}
+        </Container>
+      </section>
+
+      {/* ----------------------------------------------------- Courses --- */}
+      <section className="py-[4.5rem]">
+        <Container>
+          <Reveal direction="up" className="mb-11 text-center">
+            <p className="text-2xl font-extrabold text-text sm:text-3xl">WELCOME TO</p>
+            <h2 className="mt-1 text-3xl font-extrabold text-primary-600 sm:text-4xl">EMS ROI-ET HOSPITAL</h2>
+          </Reveal>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Reveal direction="up" delay={0}>
+              <CourseHighlightCard
+                title={emrCourse?.title ?? "Emergency Medical Responder (EMR Course)"}
+                imageUrl={emrCourse ? uploadUrl(emrCourse.cover_image) : null}
+                href={emrCourse ? `/courses/${emrCourse.slug}` : "/courses"}
+                ctaLabel="Learn more"
+              />
+            </Reveal>
+            <Reveal direction="up" delay={100}>
+              <CourseHighlightCard
+                title={emtbCourse?.title ?? "Emergency Medical Technician - Basic (EMT-B Course)"}
+                imageUrl={emtbCourse ? uploadUrl(emtbCourse.cover_image) : null}
+                href={emtbCourse ? `/courses/${emtbCourse.slug}` : "/courses"}
+                ctaLabel="Learn more"
+              />
+            </Reveal>
+            <Reveal direction="up" delay={200}>
+              <CourseHighlightCard title="Education Portal" imageUrl={null} href="/courses" ctaLabel="View more" />
+            </Reveal>
+          </div>
         </Container>
       </section>
 

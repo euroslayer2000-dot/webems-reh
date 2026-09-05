@@ -34,7 +34,7 @@ describe("can()", () => {
     expect(Object.keys(modulePermissions).sort()).toEqual(
       [
         "dashboard", "news", "category", "personnel", "structure", "station",
-        "gallery", "download", "banner", "equipment", "equipmentcategory",
+        "gallery", "course", "patientreport", "download", "banner", "equipment", "equipmentcategory",
         "equipmentborrow", "notification", "contact", "setting", "user",
       ].sort()
     );

@@ -3,7 +3,9 @@ import {
   ArrowLeftRight,
   Bell,
   ClipboardCheck,
+  ClipboardList,
   FileDown,
+  GraduationCap,
   Images,
   LayoutGrid,
   MapPin,
@@ -40,6 +42,8 @@ export const NAV_CONTENT: NavEntry[] = [
   { module: "personnel", label: "บุคลากร", href: "/admin/personnel", icon: Users },
   { module: "station", label: "จุดหน่วยกู้ชีพ (แผนที่)", href: "/admin/station", icon: MapPin },
   { module: "gallery", label: "แกลเลอรี", href: "/admin/gallery", icon: Images },
+  { module: "course", label: "หลักสูตรการเรียน", href: "/admin/course", icon: GraduationCap },
+  { module: "patientreport", label: "ข้อมูลรับแจ้งเหตุ", href: "/admin/patient-report", icon: ClipboardList },
   { module: "download", label: "เอกสารดาวน์โหลด", href: "/admin/download", icon: FileDown },
   {
     kind: "group",
