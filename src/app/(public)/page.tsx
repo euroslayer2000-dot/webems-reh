@@ -117,8 +117,8 @@ export default async function HomePage() {
 
       {/* ---------------------------------------------------- Quick links --- */}
       <section className="relative overflow-hidden py-12">
-        <div className="pointer-events-none absolute -top-24 right-[6%] h-72 w-72 rounded-full bg-accent-500/60 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-28 left-[2%] h-72 w-72 rounded-full bg-primary-500/60 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 -top-24 right-[6%] h-72 w-72 rounded-full bg-accent-300/35 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 -bottom-28 left-[2%] h-72 w-72 rounded-full bg-primary-300/35 blur-3xl" />
         <Container>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {quickLinks.map((ql, i) => (
@@ -147,8 +147,8 @@ export default async function HomePage() {
 
       {/* --------------------------------------------------------- News --- */}
       <section className="relative overflow-hidden py-[4.5rem]">
-        <div className="pointer-events-none absolute top-1/4 -left-28 h-80 w-80 rounded-full bg-primary-500/55 blur-3xl" />
-        <div className="pointer-events-none absolute -right-28 bottom-0 h-80 w-80 rounded-full bg-accent-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 top-1/4 -left-28 h-80 w-80 rounded-full bg-primary-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 -right-28 bottom-0 h-80 w-80 rounded-full bg-accent-500/55 blur-3xl" />
         <Container>
           <Reveal direction="up"><SectionTitle eyebrow="News & Updates" title="ข่าวประชาสัมพันธ์ล่าสุด" /></Reveal>
           {latestNews.length > 0 ? (
@@ -177,8 +177,8 @@ export default async function HomePage() {
 
       {/* ----------------------------------------------------- Courses --- */}
       <section className="relative overflow-hidden py-[4.5rem]">
-        <div className="pointer-events-none absolute -top-16 -left-16 h-72 w-72 rounded-full bg-primary-500/60 blur-3xl" />
-        <div className="pointer-events-none absolute -right-16 -bottom-16 h-72 w-72 rounded-full bg-accent-500/60 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 -top-16 -left-16 h-72 w-72 rounded-full bg-primary-500/60 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 -right-16 -bottom-16 h-72 w-72 rounded-full bg-accent-500/60 blur-3xl" />
         <Container>
           <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตร" /></Reveal>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -262,8 +262,8 @@ export default async function HomePage() {
       {/* -------------------------------------------------------- Gallery --- */}
       {galleries.length > 0 && (
         <section className="relative overflow-hidden bg-bg-soft py-[4.5rem]">
-          <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-accent-500/55 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-primary-500/55 blur-3xl" />
+          <div className="pointer-events-none absolute -z-10 -top-24 left-1/4 h-72 w-72 rounded-full bg-accent-500/55 blur-3xl" />
+          <div className="pointer-events-none absolute -z-10 -bottom-24 right-1/4 h-72 w-72 rounded-full bg-primary-500/55 blur-3xl" />
           <Container>
             <Reveal direction="up"><SectionTitle eyebrow="Gallery" eyebrowClassName="bg-accent-50 text-accent-600" title="ภาพกิจกรรม" /></Reveal>
             <div className="flex flex-wrap gap-3">
@@ -295,8 +295,8 @@ export default async function HomePage() {
 
       {/* ------------------------------------------------------- CTA banner --- */}
       <section className="relative overflow-hidden py-12">
-        <div className="pointer-events-none absolute top-0 left-[10%] h-56 w-56 rounded-full bg-primary-500/55 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 right-[10%] h-56 w-56 rounded-full bg-accent-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 top-0 left-[10%] h-56 w-56 rounded-full bg-primary-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute -z-10 bottom-0 right-[10%] h-56 w-56 rounded-full bg-accent-500/55 blur-3xl" />
         <Container>
           <Reveal direction="zoom" className="rounded-[var(--radius-xl)] bg-[image:var(--grad-hero)] p-8 text-center text-white shadow-[var(--shadow-lg)] lg:p-14">
             <h2 className="mb-2 text-2xl font-bold">เหตุฉุกเฉินทางการแพทย์?</h2>
