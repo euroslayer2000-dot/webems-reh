@@ -27,7 +27,7 @@ export default async function HomePage() {
   const yearStart = new Date(Date.UTC(currentYear, 0, 1));
   const yearEnd = new Date(Date.UTC(currentYear + 1, 0, 1));
 
-  const [settings, latestNews, galleries, patientStats, heroBanners, emrCourse, emtbCourse] =
+  const [settings, latestNews, galleries, patientStats, heroBanners, emrCourse, emtbCourse, eduPortalCourse] =
     await Promise.all([
       getSettings(),
       prisma.news.findMany({
@@ -57,6 +57,7 @@ export default async function HomePage() {
       }),
       prisma.course.findFirst({ where: { slug: "emr", is_active: true } }),
       prisma.course.findFirst({ where: { slug: "emt-b", is_active: true } }),
+      prisma.course.findFirst({ where: { slug: "education-portal", is_active: true } }),
     ]);
 
   const emergencyPhone = settings.emergency_phone || "1669";
@@ -79,13 +80,31 @@ export default async function HomePage() {
     <div>
       {heroBanners.length > 0 && <HeroBannerCarousel banners={heroBanners} />}
 
+      {/* ------------------------------------------------- Welcome heading --- */}
+      <section className="py-10">
+        <Container>
+          <Reveal direction="up" className="text-center">
+            <p className="text-[1.8rem] font-extrabold text-text sm:text-[2.25rem]">WELCOME TO</p>
+            <h2 className="mt-1 bg-[image:var(--grad-hero)] bg-clip-text text-[2.25rem] font-extrabold text-transparent sm:text-[2.7rem]">
+              EMS ROI-ET HOSPITAL
+            </h2>
+          </Reveal>
+        </Container>
+      </section>
+
       {/* ---------------------------------------------------- Stats strip --- */}
-      <section className="bg-surface py-12">
+      <section className="bg-[image:var(--grad-soft)] py-12">
         <Container>
           <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} direction="zoom" delay={i * 100} className="p-4 text-center">
-                <stat.icon size={40} className="mx-auto mb-3 text-text" strokeWidth={1.75} />
+                <span
+                  className={`mx-auto mb-3 grid h-16 w-16 place-items-center rounded-full text-white shadow-[var(--shadow-sm)] ${
+                    i % 2 === 0 ? "bg-[image:var(--grad-primary)]" : "bg-[image:var(--grad-accent)]"
+                  }`}
+                >
+                  <stat.icon size={28} strokeWidth={1.75} />
+                </span>
                 <div className="text-[2.4rem] leading-none font-extrabold text-primary-600">
                   {stat.value.toLocaleString("th-TH")}
                 </div>
@@ -97,7 +116,9 @@ export default async function HomePage() {
       </section>
 
       {/* ---------------------------------------------------- Quick links --- */}
-      <section className="py-12">
+      <section className="relative overflow-hidden py-12">
+        <div className="pointer-events-none absolute -top-24 right-[6%] h-72 w-72 rounded-full bg-accent-500/60 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-[2%] h-72 w-72 rounded-full bg-primary-500/60 blur-3xl" />
         <Container>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {quickLinks.map((ql, i) => (
@@ -106,7 +127,11 @@ export default async function HomePage() {
                   href={ql.href}
                   className="flex h-full items-center gap-4 rounded-[var(--radius)] border border-border bg-surface p-5 shadow-[var(--shadow-sm)] transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-md)]"
                 >
-                  <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl bg-[image:var(--grad-primary)] text-white transition-transform">
+                  <span
+                    className={`grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white transition-transform ${
+                      i % 2 === 0 ? "bg-[image:var(--grad-primary)]" : "bg-[image:var(--grad-accent)]"
+                    }`}
+                  >
                     <ql.icon size={22} />
                   </span>
                   <span>
@@ -121,7 +146,9 @@ export default async function HomePage() {
       </section>
 
       {/* --------------------------------------------------------- News --- */}
-      <section className="py-[4.5rem]">
+      <section className="relative overflow-hidden py-[4.5rem]">
+        <div className="pointer-events-none absolute top-1/4 -left-28 h-80 w-80 rounded-full bg-primary-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute -right-28 bottom-0 h-80 w-80 rounded-full bg-accent-500/55 blur-3xl" />
         <Container>
           <Reveal direction="up"><SectionTitle eyebrow="News & Updates" title="ข่าวประชาสัมพันธ์ล่าสุด" /></Reveal>
           {latestNews.length > 0 ? (
@@ -149,12 +176,11 @@ export default async function HomePage() {
       </section>
 
       {/* ----------------------------------------------------- Courses --- */}
-      <section className="py-[4.5rem]">
+      <section className="relative overflow-hidden py-[4.5rem]">
+        <div className="pointer-events-none absolute -top-16 -left-16 h-72 w-72 rounded-full bg-primary-500/60 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 -bottom-16 h-72 w-72 rounded-full bg-accent-500/60 blur-3xl" />
         <Container>
-          <Reveal direction="up" className="mb-11 text-center">
-            <p className="text-2xl font-extrabold text-text sm:text-3xl">WELCOME TO</p>
-            <h2 className="mt-1 text-3xl font-extrabold text-primary-600 sm:text-4xl">EMS ROI-ET HOSPITAL</h2>
-          </Reveal>
+          <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตร" /></Reveal>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Reveal direction="up" delay={0}>
               <CourseHighlightCard
@@ -173,7 +199,12 @@ export default async function HomePage() {
               />
             </Reveal>
             <Reveal direction="up" delay={200}>
-              <CourseHighlightCard title="Education Portal" imageUrl={null} href="/courses" ctaLabel="View more" />
+              <CourseHighlightCard
+                title={eduPortalCourse?.title ?? "Education Portal"}
+                imageUrl={eduPortalCourse ? uploadUrl(eduPortalCourse.cover_image) : null}
+                href={eduPortalCourse ? `/courses/${eduPortalCourse.slug}` : "/courses"}
+                ctaLabel="View more"
+              />
             </Reveal>
           </div>
         </Container>
@@ -230,9 +261,11 @@ export default async function HomePage() {
 
       {/* -------------------------------------------------------- Gallery --- */}
       {galleries.length > 0 && (
-        <section className="bg-bg-soft py-[4.5rem]">
+        <section className="relative overflow-hidden bg-bg-soft py-[4.5rem]">
+          <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-accent-500/55 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-primary-500/55 blur-3xl" />
           <Container>
-            <Reveal direction="up"><SectionTitle eyebrow="Gallery" eyebrowClassName="bg-surface text-text" title="ภาพกิจกรรม" /></Reveal>
+            <Reveal direction="up"><SectionTitle eyebrow="Gallery" eyebrowClassName="bg-accent-50 text-accent-600" title="ภาพกิจกรรม" /></Reveal>
             <div className="flex flex-wrap gap-3">
               {galleries.map((gallery, i) => (
                 <Reveal
@@ -261,7 +294,9 @@ export default async function HomePage() {
       )}
 
       {/* ------------------------------------------------------- CTA banner --- */}
-      <section className="py-12">
+      <section className="relative overflow-hidden py-12">
+        <div className="pointer-events-none absolute top-0 left-[10%] h-56 w-56 rounded-full bg-primary-500/55 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-[10%] h-56 w-56 rounded-full bg-accent-500/55 blur-3xl" />
         <Container>
           <Reveal direction="zoom" className="rounded-[var(--radius-xl)] bg-[image:var(--grad-hero)] p-8 text-center text-white shadow-[var(--shadow-lg)] lg:p-14">
             <h2 className="mb-2 text-2xl font-bold">เหตุฉุกเฉินทางการแพทย์?</h2>

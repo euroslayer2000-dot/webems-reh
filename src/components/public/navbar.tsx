@@ -47,7 +47,7 @@ export function Navbar({ siteName }: { siteName: string }) {
   }
 
   return (
-    <header className="sticky top-0 z-[1030] border-b border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[14px] backdrop-saturate-150">
+    <header className="sticky top-0 z-[1030] border-b border-[var(--glass-border)] bg-[image:var(--glass-grad)] backdrop-blur-[14px] backdrop-saturate-150">
       <div className="relative mx-auto flex max-w-[1360px] items-center gap-4 px-4 py-2">
         <Link href="/" className="flex max-w-[62%] items-center gap-2.5 font-extrabold text-text">
           <span className="grid h-[60px] w-[60px] shrink-0 place-items-center overflow-hidden rounded-[14px] bg-white p-0.5 shadow-[var(--shadow-primary)] transition-transform hover:-rotate-6 hover:scale-105">
