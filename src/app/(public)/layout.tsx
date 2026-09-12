@@ -8,7 +8,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <Navbar siteName={settings.site_name || "EMS ROI-ET HOSPITAL"} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 bg-surface">{children}</main>
       <Footer settings={settings} />
     </>
   );

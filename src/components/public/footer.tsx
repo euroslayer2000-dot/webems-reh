@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AlertTriangle, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Container } from "@/components/public/container";
 
 function FacebookIcon() {
   return (
@@ -28,7 +29,7 @@ export function Footer({ settings }: { settings: Record<string, string> }) {
 
   return (
     <footer className="mt-16 bg-[#0d1b17] pt-14 text-[#c9d6d0] dark:bg-[#08110e]">
-      <div className="mx-auto grid max-w-[1180px] gap-10 px-4 md:grid-cols-2 lg:grid-cols-4">
+      <Container className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="mb-3.5 flex items-center gap-2.5">
             <Image
@@ -109,12 +110,12 @@ export function Footer({ settings }: { settings: Record<string, string> }) {
             </li>
           </ul>
         </div>
-      </div>
+      </Container>
 
-      <div className="mt-10 border-t border-white/10 px-4 py-[1.3rem]">
-        <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-2 text-[0.85rem] md:flex-row">
+      <div className="mt-10 border-t border-white/10 py-[1.3rem]">
+        <Container className="flex flex-col items-center justify-between gap-2 text-[0.85rem] md:flex-row">
           <span>© {buddhistYear} {siteName}. สงวนลิขสิทธิ์.</span>
-        </div>
+        </Container>
       </div>
     </footer>
   );

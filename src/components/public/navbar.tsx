@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogIn, Menu, X } from "lucide-react";
 import { NAV_LINKS } from "./nav-links";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Container } from "@/components/public/container";
 
 function isLinkActive(pathname: string, href: string, hasChildren: boolean) {
   if (href === "/") return pathname === "/";
@@ -47,15 +48,15 @@ export function Navbar({ siteName }: { siteName: string }) {
   }
 
   return (
-    <header className="sticky top-0 z-[1030] border-b border-[var(--glass-border)] bg-[image:var(--glass-grad)] backdrop-blur-[14px] backdrop-saturate-150">
-      <div className="relative mx-auto flex max-w-[1360px] items-center gap-4 px-4 py-2">
-        <Link href="/" className="flex max-w-[62%] items-center gap-2.5 font-extrabold text-text">
-          <span className="grid h-[60px] w-[60px] shrink-0 place-items-center overflow-hidden rounded-[14px] bg-white p-0.5 shadow-[var(--shadow-primary)] transition-transform hover:-rotate-6 hover:scale-105">
+    <header className="sticky top-0 z-[1030] border-b border-white/15 bg-[image:var(--grad-navbar)] shadow-[var(--shadow-md)]">
+      <Container className="relative flex items-center gap-4 py-2">
+        <Link href="/" className="flex max-w-[62%] items-center gap-2.5 font-extrabold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.25)]">
+          <span className="grid h-[60px] w-[60px] shrink-0 place-items-center overflow-hidden rounded-[14px] bg-white p-0.5 shadow-[0_4px_14px_rgba(0,0,0,0.2)] transition-transform hover:-rotate-6 hover:scale-105">
             <Image src="/assets/img/logoems.jpg" alt={siteName} width={60} height={60} className="h-full w-full rounded-[11px] object-contain" />
           </span>
           <span className="min-w-0">
             <span className="block [overflow-wrap:anywhere] text-[clamp(0.82rem,1.05vw,1rem)] leading-tight font-extrabold">{siteName}</span>
-            <span className="mt-0.5 block text-[0.68rem] font-medium text-text-muted">ศูนย์รับแจ้งเหตุและสั่งการณ์โรงพยาบาลร้อยเอ็ด</span>
+            <span className="mt-0.5 block text-[0.68rem] font-medium text-white/80">ศูนย์รับแจ้งเหตุและสั่งการณ์โรงพยาบาลร้อยเอ็ด</span>
           </span>
         </Link>
 
@@ -71,8 +72,8 @@ export function Navbar({ siteName }: { siteName: string }) {
               >
                 <Link
                   href={link.href}
-                  className={`relative flex items-center gap-1 rounded-[10px] px-3.5 py-2 text-sm font-semibold whitespace-nowrap ${
-                    active ? "bg-primary-50 text-primary-500 dark:bg-primary-500/16" : "text-text hover:bg-primary-50 hover:text-primary-500 dark:hover:bg-primary-500/16"
+                  className={`relative flex items-center gap-1 rounded-[10px] px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] transition-colors ${
+                    active ? "bg-white/25" : "hover:bg-white/15"
                   }`}
                 >
                   {link.label}
@@ -100,7 +101,7 @@ export function Navbar({ siteName }: { siteName: string }) {
         <div className="ml-auto flex items-center gap-2 xl:ml-3.5">
           <Link
             href="/admin/login"
-            className="hidden items-center gap-1.5 rounded-[10px] bg-[image:var(--grad-accent)] px-4.5 py-2 text-sm font-bold text-white shadow-[var(--shadow-accent)] transition-transform hover:-translate-y-0.5 xl:flex"
+            className="hidden items-center gap-1.5 rounded-[10px] bg-white px-4.5 py-2 text-sm font-bold text-accent-600 shadow-[0_4px_14px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5 xl:flex"
           >
             <LogIn size={14} /> เข้าสู่ระบบ
           </Link>
@@ -108,7 +109,7 @@ export function Navbar({ siteName }: { siteName: string }) {
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            className="grid h-[46px] w-[46px] place-items-center rounded-xl bg-[image:var(--grad-primary)] text-white shadow-[var(--shadow-primary)] xl:hidden"
+            className="grid h-[46px] w-[46px] place-items-center rounded-xl bg-white/15 text-white shadow-[0_4px_14px_rgba(0,0,0,0.18)] ring-1 ring-white/30 xl:hidden"
             aria-label="เปิด/ปิดเมนู"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -153,7 +154,7 @@ export function Navbar({ siteName }: { siteName: string }) {
             </nav>
           </div>
         )}
-      </div>
+      </Container>
     </header>
   );
 }

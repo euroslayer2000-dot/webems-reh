@@ -32,6 +32,9 @@
   --grad-accent: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-600) 100%);
   --grad-hero: linear-gradient(120deg, #0f5c49 0%, #1f8a70 45%, #ff6b9d 130%);
   --grad-soft: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-accent-50) 100%);
+  --grad-primary-soft: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-100) 38%, var(--color-primary-50) 100%);
+  --grad-accent-soft: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-100) 38%, var(--color-accent-50) 100%);
+  --grad-navbar: linear-gradient(90deg, var(--color-primary-700) 0%, var(--color-primary-500) 38%, var(--color-accent-500) 72%, var(--color-accent-600) 100%);
 
   --glass-bg: rgba(255, 255, 255, 0.65);
   --glass-grad: linear-gradient(120deg, rgba(233, 247, 242, 0.85) 0%, rgba(255, 238, 244, 0.85) 100%);
@@ -62,6 +65,8 @@
     --color-text-muted: #93a4ac;
 
     --grad-soft: linear-gradient(135deg, #10201b 0%, #241522 100%);
+    --grad-primary-soft: linear-gradient(135deg, #0f5c49 0%, #10201b 38%, var(--color-bg-soft) 100%);
+    --grad-accent-soft: linear-gradient(135deg, #e84e83 0%, #241522 38%, var(--color-bg-soft) 100%);
     --glass-bg: rgba(23, 34, 39, 0.6);
     --glass-grad: linear-gradient(120deg, rgba(16, 32, 27, 0.75) 0%, rgba(36, 21, 34, 0.75) 100%);
     --glass-border: rgba(255, 255, 255, 0.08);
@@ -83,6 +88,8 @@
   --color-text-muted: #93a4ac;
 
   --grad-soft: linear-gradient(135deg, #10201b 0%, #241522 100%);
+  --grad-primary-soft: linear-gradient(135deg, #0f5c49 0%, #10201b 38%, var(--color-bg-soft) 100%);
+  --grad-accent-soft: linear-gradient(135deg, #e84e83 0%, #241522 38%, var(--color-bg-soft) 100%);
   --glass-bg: rgba(23, 34, 39, 0.6);
   --glass-grad: linear-gradient(120deg, rgba(16, 32, 27, 0.75) 0%, rgba(36, 21, 34, 0.75) 100%);
   --glass-border: rgba(255, 255, 255, 0.08);
