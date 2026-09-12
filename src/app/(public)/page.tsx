@@ -84,7 +84,7 @@ export default async function HomePage() {
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-[#FFBBDA] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
             <Reveal direction="up" className="text-center">
-              <p className="font-[Arial,sans-serif] text-[2.14rem] font-normal text-black sm:text-[2.68rem]">WELCOME TO</p>
+              <p className="font-[Arial,sans-serif] text-[2.78rem] font-normal text-black sm:text-[3.48rem]">WELCOME TO</p>
               <h2 className="mt-1 font-[Arial,sans-serif] text-[2.93rem] font-extrabold text-primary-500 sm:text-[3.51rem]">
                 EMS ROI-ET HOSPITAL
               </h2>
