@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BadgeCheck,
   FileDown,
-  HeartPulse,
   MessageCircle,
   PhoneCall,
   Users,
@@ -173,7 +172,7 @@ export default async function HomePage() {
       <section className="py-[4.5rem]">
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-primary-500 px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
-            <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตร" /></Reveal>
+            <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตรการเรียน" titleClassName="text-white" /></Reveal>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal direction="up" delay={0}>
                 <CourseHighlightCard
@@ -249,15 +248,6 @@ export default async function HomePage() {
                   height={2048}
                   className="h-auto w-[340px] max-w-full rounded-[var(--radius-lg)] bg-surface object-contain shadow-[var(--shadow-lg)]"
                 />
-                <div className="absolute -bottom-[22px] -right-[14px] hidden rounded-[var(--radius)] border border-border bg-surface p-4 shadow-[var(--shadow-md)] lg:block">
-                  <div className="flex items-center gap-2">
-                    <HeartPulse size={26} className="bg-[image:var(--grad-accent)] bg-clip-text text-transparent" />
-                    <div>
-                      <strong className="block text-text">พร้อมช่วยเหลือ</strong>
-                      <small className="text-text-muted">ตลอด 24 ชั่วโมง</small>
-                    </div>
-                  </div>
-                </div>
               </Reveal>
 
               <Reveal direction="left">
