@@ -8,7 +8,13 @@ import type { Role } from "@/lib/permissions";
  * in auth.ts, used by the route handler and server-side `auth()` calls.
  */
 export const authConfig = {
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    // Work-shift session: idle 8h logs the admin out; active use renews
+    // the 8h window every hour so a continuous shift isn't interrupted.
+    maxAge: 8 * 60 * 60,
+    updateAge: 60 * 60,
+  },
   pages: { signIn: "/admin/login" },
   providers: [],
   // Railway (and most PaaS reverse proxies) terminate TLS in front of the
