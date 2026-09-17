@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { FormField, inputClass } from "@/components/admin/form-field";
 import { FormActions } from "@/components/admin/form-actions";
 import { AdminCard, AdminCardBody } from "@/components/admin/admin-card";
@@ -8,6 +8,7 @@ import { ImageFileField } from "@/components/admin/image-file-field";
 import { DocumentFileField } from "@/components/admin/document-file-field";
 import { uploadUrl } from "@/lib/upload";
 import { EQUIPMENT_STATUS_META } from "@/lib/equipment-status";
+import { isAutoEquipmentCode } from "@/lib/equipment-code";
 import { createEquipment, updateEquipment, type EquipmentFormState } from "./actions";
 
 type Category = { id: number; name: string };
@@ -36,16 +37,57 @@ export function EquipmentForm({ categories, item }: { categories: Category[]; it
   const action = item ? updateEquipment.bind(null, item.id) : createEquipment;
   const [state, formAction, isPending] = useActionState(action, initialState);
 
+  const itemHasAutoCode = item ? isAutoEquipmentCode(item.code) : false;
+  const [hasCode, setHasCode] = useState(!itemHasAutoCode);
+  const [codeValue, setCodeValue] = useState(itemHasAutoCode ? "" : item?.code ?? "");
+
   return (
     <AdminCard>
       <AdminCardBody>
         <form action={formAction} className="grid gap-5">
           <div className="grid gap-5 sm:grid-cols-2">
-            <FormField label="เลขครุภัณฑ์" htmlFor="code" required error={state.errors?.code}>
-              <input id="code" name="code" defaultValue={item?.code} className={inputClass} />
+            <FormField label="เลขครุภัณฑ์" htmlFor="code" required={hasCode} error={state.errors?.code}>
+              <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3 text-sm text-text">
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="radio"
+                      name="code_mode"
+                      value="manual"
+                      checked={hasCode}
+                      onChange={() => setHasCode(true)}
+                      className="h-4 w-4 border-border text-primary-600 focus:ring-primary-500"
+                    />
+                    มีเลข
+                  </label>
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="radio"
+                      name="code_mode"
+                      value="auto"
+                      checked={!hasCode}
+                      onChange={() => setHasCode(false)}
+                      className="h-4 w-4 border-border text-primary-600 focus:ring-primary-500"
+                    />
+                    ไม่มีเลข
+                  </label>
+                </div>
+                <div className="w-137.5 min-w-0 max-w-full shrink-0">
+                  <input
+                    id="code"
+                    name="code"
+                    value={hasCode ? codeValue : ""}
+                    onChange={(e) => setCodeValue(e.target.value)}
+                    disabled={!hasCode}
+                    className={`${inputClass} ${!hasCode ? "cursor-not-allowed bg-surface-2 text-text-muted" : ""}`}
+                  />
+                </div>
+              </div>
             </FormField>
             <FormField label="ชื่อครุภัณฑ์" htmlFor="name" required error={state.errors?.name}>
-              <input id="name" name="name" defaultValue={item?.name} className={inputClass} />
+              <div className="w-137.5 max-w-full">
+                <input id="name" name="name" defaultValue={item?.name} className={inputClass} />
+              </div>
             </FormField>
           </div>
 

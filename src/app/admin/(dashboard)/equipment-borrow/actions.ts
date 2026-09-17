@@ -98,10 +98,11 @@ export async function returnBorrow(formData: FormData): Promise<void> {
   }
 
   const condition = formData.get("return_condition") === "damaged" ? "damaged" : "normal";
+  const detail = String(formData.get("return_note") ?? "").trim();
   const newStatus = condition === "damaged" ? "damaged" : "available";
   await prisma.equipmentBorrow.update({ where: { id }, data: { return_date: new Date(), return_condition: condition } });
   await prisma.equipment.update({ where: { id: loan.equipment_id }, data: { status: newStatus } });
-  await logStatusChange(loan.equipment_id, "borrowed", newStatus, `รับคืนจาก ${loan.borrower_name}`);
+  await logStatusChange(loan.equipment_id, "borrowed", newStatus, `รับคืนจาก ${loan.borrower_name}${detail ? ` — ${detail}` : ""}`);
 
   redirectWithFlash("/admin/equipment-borrow", "รับคืนครุภัณฑ์เรียบร้อยแล้ว");
 }

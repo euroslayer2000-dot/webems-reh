@@ -8,9 +8,9 @@ import { uploadUrl } from "@/lib/upload";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 import { PageHead } from "@/components/admin/page-head";
 import { AdminCard } from "@/components/admin/admin-card";
-import { inputClass } from "@/components/admin/form-field";
 import { btnDangerSm, btnGhostSm, btnPrimary } from "@/components/admin/button-styles";
-import { deleteBorrow, returnBorrow } from "./actions";
+import { deleteBorrow } from "./actions";
+import { ReturnBorrowButton } from "./return-borrow-button";
 
 const DUE_SOON_DAYS = 3;
 
@@ -132,16 +132,7 @@ export default async function AdminEquipmentBorrowPage() {
                   </td>
                   <td className="px-5 py-2.5">
                     <div className="flex justify-end gap-1.5">
-                      {!loan.return_date && (
-                        <form action={returnBorrow} className="flex items-center gap-1">
-                          <input type="hidden" name="id" value={loan.id} />
-                          <select name="return_condition" className={`${inputClass} px-2 py-1 text-xs`}>
-                            <option value="normal">ปกติ</option>
-                            <option value="damaged">ชำรุด</option>
-                          </select>
-                          <ConfirmSubmitButton confirmText="ยืนยันรับคืนครุภัณฑ์นี้ ?" className={btnGhostSm}>รับคืน</ConfirmSubmitButton>
-                        </form>
-                      )}
+                      {!loan.return_date && <ReturnBorrowButton loanId={loan.id} equipmentName={loan.equipment.name} />}
                       <Link href={`/admin/equipment-borrow/${loan.id}/edit`} className={btnGhostSm}>แก้ไข</Link>
                       <form action={deleteBorrow}>
                         <input type="hidden" name="id" value={loan.id} />

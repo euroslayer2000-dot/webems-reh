@@ -6,11 +6,11 @@ import { requireActionAccess } from "@/lib/admin-auth";
 import { deleteUpload, saveUpload } from "@/lib/uploads-write";
 import { redirectWithFlash } from "@/lib/flash-redirect";
 import { logStatusChange } from "@/lib/equipment-status-log";
+import { EQUIPMENT_AUTO_CODE_PREFIX, isAutoEquipmentCode } from "@/lib/equipment-code";
 
 const STATUSES = ["available", "borrowed", "damaged", "maintenance", "disposed"] as const;
 
 const equipmentSchema = z.object({
-  code: z.string().min(1, "กรุณากรอกเลขครุภัณฑ์").max(50),
   name: z.string().min(1, "กรุณากรอกชื่อครุภัณฑ์").max(200),
   status: z.enum(STATUSES),
   category_id: z.string().optional(),
@@ -24,12 +24,11 @@ const equipmentSchema = z.object({
 
 export type EquipmentFormState = {
   ok: boolean;
-  errors?: Partial<Record<keyof z.infer<typeof equipmentSchema>, string>>;
+  errors?: Partial<Record<keyof z.infer<typeof equipmentSchema> | "code", string>>;
 };
 
 function parse(formData: FormData) {
   return equipmentSchema.safeParse({
-    code: formData.get("code"),
     name: formData.get("name"),
     status: formData.get("status"),
     category_id: formData.get("category_id") || undefined,
@@ -51,7 +50,6 @@ function toErrors(error: z.ZodError<z.infer<typeof equipmentSchema>>): Equipment
 function buildData(parsed: z.infer<typeof equipmentSchema>) {
   return {
     category_id: parsed.category_id ? Number(parsed.category_id) : null,
-    code: parsed.code,
     name: parsed.name,
     description: parsed.description || null,
     unit: parsed.unit || "ชิ้น",
@@ -61,6 +59,42 @@ function buildData(parsed: z.infer<typeof equipmentSchema>) {
     purchase_date: parsed.purchase_date ? new Date(parsed.purchase_date) : null,
     purchase_price: parsed.purchase_price ? parsed.purchase_price : null,
   };
+}
+
+/** Equipment without a physical asset tag gets an internal placeholder code
+ * (rather than making the column nullable) so the existing unique/NOT NULL
+ * "code" constraint, QR links, and exports keep working unchanged. */
+async function generateAutoCode(): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const candidate = `${EQUIPMENT_AUTO_CODE_PREFIX}${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    const exists = await prisma.equipment.findUnique({ where: { code: candidate } });
+    if (!exists) return candidate;
+  }
+  throw new Error("ไม่สามารถสร้างเลขครุภัณฑ์อัตโนมัติได้ กรุณาลองใหม่");
+}
+
+async function resolveCode(
+  formData: FormData,
+  opts: { excludeId?: number; existingCode?: string | null }
+): Promise<{ code: string } | { error: string }> {
+  const mode = formData.get("code_mode") === "auto" ? "auto" : "manual";
+
+  if (mode === "auto") {
+    // Keep the existing placeholder on save instead of churning it on every edit.
+    if (opts.existingCode && isAutoEquipmentCode(opts.existingCode)) return { code: opts.existingCode };
+    return { code: await generateAutoCode() };
+  }
+
+  const raw = String(formData.get("code") ?? "").trim();
+  if (!raw) return { error: "กรุณากรอกเลขครุภัณฑ์" };
+  if (raw.length > 50) return { error: "เลขครุภัณฑ์ต้องไม่เกิน 50 ตัวอักษร" };
+
+  const dup = await prisma.equipment.findFirst({
+    where: opts.excludeId ? { code: raw, id: { not: opts.excludeId } } : { code: raw },
+  });
+  if (dup) return { error: "เลขครุภัณฑ์นี้ถูกใช้แล้ว" };
+
+  return { code: raw };
 }
 
 /** Saves a single named file field if present, else keeps the existing path.
@@ -78,8 +112,8 @@ export async function createEquipment(_prev: EquipmentFormState, formData: FormD
   const parsed = parse(formData);
   if (!parsed.success) return { ok: false, errors: toErrors(parsed.error) };
 
-  const dup = await prisma.equipment.findUnique({ where: { code: parsed.data.code } });
-  if (dup) return { ok: false, errors: { code: "เลขครุภัณฑ์นี้ถูกใช้แล้ว" } };
+  const codeResult = await resolveCode(formData, {});
+  if ("error" in codeResult) return { ok: false, errors: { code: codeResult.error } };
 
   const photo = await resolveImageField(formData, "photo", null);
   const photo2 = await resolveImageField(formData, "photo2", null);
@@ -88,7 +122,7 @@ export async function createEquipment(_prev: EquipmentFormState, formData: FormD
   const receipt_document = await resolveImageField(formData, "receipt_document", null);
 
   const created = await prisma.equipment.create({
-    data: { ...buildData(parsed.data), photo, photo2, photo3, warranty_document, receipt_document },
+    data: { ...buildData(parsed.data), code: codeResult.code, photo, photo2, photo3, warranty_document, receipt_document },
   });
   await logStatusChange(created.id, null, created.status);
 
@@ -102,8 +136,8 @@ export async function updateEquipment(id: number, _prev: EquipmentFormState, for
   const parsed = parse(formData);
   if (!parsed.success) return { ok: false, errors: toErrors(parsed.error) };
 
-  const dup = await prisma.equipment.findFirst({ where: { code: parsed.data.code, id: { not: id } } });
-  if (dup) return { ok: false, errors: { code: "เลขครุภัณฑ์นี้ถูกใช้แล้ว" } };
+  const codeResult = await resolveCode(formData, { excludeId: id, existingCode: existing.code });
+  if ("error" in codeResult) return { ok: false, errors: { code: codeResult.error } };
 
   const photo = await resolveImageField(formData, "photo", existing.photo);
   const photo2 = await resolveImageField(formData, "photo2", existing.photo2);
@@ -113,7 +147,7 @@ export async function updateEquipment(id: number, _prev: EquipmentFormState, for
 
   await prisma.equipment.update({
     where: { id },
-    data: { ...buildData(parsed.data), photo, photo2, photo3, warranty_document, receipt_document },
+    data: { ...buildData(parsed.data), code: codeResult.code, photo, photo2, photo3, warranty_document, receipt_document },
   });
   await logStatusChange(id, existing.status, parsed.data.status);
 
