@@ -12,6 +12,7 @@ export function AdminShell({
   userRole,
   username,
   unreadNotifications,
+  unreadMedicineNotifications,
   unreadContacts,
   recentNotifications,
   children,
@@ -21,6 +22,7 @@ export function AdminShell({
   userRole: string;
   username: string;
   unreadNotifications: number;
+  unreadMedicineNotifications: number;
   unreadContacts: number;
   recentNotifications: TopbarNotification[];
   children: ReactNode;
@@ -32,6 +34,7 @@ export function AdminShell({
       <Sidebar
         role={role}
         unreadNotifications={unreadNotifications}
+        unreadMedicineNotifications={unreadMedicineNotifications}
         unreadContacts={unreadContacts}
         mobileOpen={mobileOpen}
         onNavigate={() => setMobileOpen(false)}
@@ -49,7 +52,7 @@ export function AdminShell({
           userName={userName}
           userRole={userRole}
           username={username}
-          unreadNotifications={unreadNotifications}
+          unreadNotifications={unreadNotifications + unreadMedicineNotifications}
           recentNotifications={recentNotifications}
           onMenuClick={() => setMobileOpen((v) => !v)}
         />

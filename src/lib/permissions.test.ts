@@ -25,7 +25,7 @@ describe("can()", () => {
   });
 
   it("allows editor into the shared content modules", () => {
-    for (const moduleName of ["news", "category", "personnel", "gallery", "equipment"]) {
+    for (const moduleName of ["news", "category", "personnel", "gallery", "equipment", "medicine"]) {
       expect(can("editor", moduleName)).toBe(true);
     }
   });
@@ -35,7 +35,8 @@ describe("can()", () => {
       [
         "dashboard", "news", "category", "personnel", "structure", "station",
         "gallery", "course", "patientreport", "download", "banner", "equipment", "equipmentcategory",
-        "equipmentborrow", "notification", "contact", "setting", "user",
+        "equipmentborrow", "medicine", "medicinecategory", "medicinedispense",
+        "notification", "contact", "setting", "user",
       ].sort()
     );
   });

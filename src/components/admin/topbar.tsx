@@ -13,6 +13,7 @@ export type TopbarNotification = {
   level: string;
   is_read: boolean;
   created_at: string | Date;
+  kind: "equipment" | "medicine";
 };
 
 export function Topbar({
@@ -89,13 +90,15 @@ export function Topbar({
               ) : (
                 recentNotifications.map((n) => (
                   <Link
-                    key={n.id}
-                    href="/admin/equipment-borrow"
+                    key={`${n.kind}-${n.id}`}
+                    href={n.kind === "medicine" ? "/admin/medicine/dashboard" : "/admin/equipment-borrow"}
                     onClick={() => setNotifOpen(false)}
                     className={`block border-b border-border px-4 py-2.5 text-sm last:border-0 hover:bg-bg-soft ${n.is_read ? "text-text-muted" : "font-semibold text-text"}`}
                   >
                     <span className={`mr-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white ${n.level === "overdue" ? "bg-danger" : "bg-warning"}`}>
-                      {n.level === "overdue" ? "เกินกำหนด" : "ใกล้ครบกำหนด"}
+                      {n.kind === "medicine"
+                        ? n.level === "overdue" ? "ด่วน" : "เฝ้าระวัง"
+                        : n.level === "overdue" ? "เกินกำหนด" : "ใกล้ครบกำหนด"}
                     </span>
                     {n.title}
                     <div className="mt-0.5 text-xs text-text-muted">{formatDateTh(n.created_at, true)}</div>

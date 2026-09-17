@@ -18,13 +18,24 @@ export default async function AdminDashboardLayout({
   const user = session!.user;
   const role = user.role;
 
-  const [unreadNotifications, unreadContacts, recentNotifications] = await Promise.all([
+  const [unreadNotifications, unreadContacts, recentNotifications, unreadMedicineNotifications, recentMedicineNotifications] = await Promise.all([
     can(role, "notification") ? prisma.notification.count({ where: { is_read: false } }) : 0,
     can(role, "contact") ? prisma.contact.count({ where: { is_read: false } }) : 0,
     can(role, "notification")
       ? prisma.notification.findMany({ orderBy: [{ is_read: "asc" }, { created_at: "desc" }], take: 8 })
       : [],
+    can(role, "notification") ? prisma.medicineNotification.count({ where: { is_read: false } }) : 0,
+    can(role, "notification")
+      ? prisma.medicineNotification.findMany({ orderBy: [{ is_read: "asc" }, { created_at: "desc" }], take: 8 })
+      : [],
   ]);
+
+  const recentCombined = [
+    ...recentNotifications.map((n) => ({ id: n.id, title: n.title, level: n.level, is_read: n.is_read, created_at: n.created_at, kind: "equipment" as const })),
+    ...recentMedicineNotifications.map((n) => ({ id: n.id, title: n.title, level: n.level, is_read: n.is_read, created_at: n.created_at, kind: "medicine" as const })),
+  ]
+    .sort((a, b) => (a.is_read === b.is_read ? +b.created_at - +a.created_at : a.is_read ? 1 : -1))
+    .slice(0, 8);
 
   return (
     <div className="bg-bg">
@@ -38,14 +49,9 @@ export default async function AdminDashboardLayout({
         userRole={ROLE_LABEL[role] ?? role}
         username={user.username}
         unreadNotifications={unreadNotifications}
+        unreadMedicineNotifications={unreadMedicineNotifications}
         unreadContacts={unreadContacts}
-        recentNotifications={recentNotifications.map((n) => ({
-          id: n.id,
-          title: n.title,
-          level: n.level,
-          is_read: n.is_read,
-          created_at: n.created_at,
-        }))}
+        recentNotifications={recentCombined}
       >
         {children}
       </AdminShell>

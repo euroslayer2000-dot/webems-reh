@@ -18,3 +18,18 @@ export async function markAllNotificationsRead(): Promise<void> {
 
   redirectWithFlash("/admin/notification", "ทำเครื่องหมายว่าอ่านแล้วทั้งหมด");
 }
+
+export async function markMedicineNotificationRead(formData: FormData): Promise<void> {
+  await requireActionAccess("notification");
+  const id = Number(formData.get("id"));
+  await prisma.medicineNotification.update({ where: { id }, data: { is_read: true } });
+
+  redirectWithFlash("/admin/notification", "ทำเครื่องหมายว่าอ่านแล้ว");
+}
+
+export async function markAllMedicineNotificationsRead(): Promise<void> {
+  await requireActionAccess("notification");
+  await prisma.medicineNotification.updateMany({ where: { is_read: false }, data: { is_read: true } });
+
+  redirectWithFlash("/admin/notification", "ทำเครื่องหมายว่าอ่านแล้วทั้งหมด");
+}

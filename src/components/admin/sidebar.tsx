@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { isLeaf, NAV_CONTENT, NAV_DASHBOARD, NAV_SYSTEM, type NavLeaf } from "./nav-items";
+import { isLeaf, NAV_CONTENT, NAV_DASHBOARD, NAV_SYSTEM, type NavEntry, type NavLeaf } from "./nav-items";
 import { can, type Role } from "@/lib/permissions";
 
 function isActive(pathname: string, href: string) {
@@ -45,23 +45,26 @@ function Leaf({
 export function Sidebar({
   role,
   unreadNotifications,
+  unreadMedicineNotifications,
   unreadContacts,
   mobileOpen,
   onNavigate,
 }: {
   role: Role;
   unreadNotifications: number;
+  unreadMedicineNotifications: number;
   unreadContacts: number;
   mobileOpen: boolean;
   onNavigate: () => void;
 }) {
   const pathname = usePathname();
-  const equipGroupActiveDefault = NAV_CONTENT.some(
-    (entry) => !isLeaf(entry) && entry.items.some((item) => isActive(pathname, item.href))
-  );
-  const [equipOpen, setEquipOpen] = useState(equipGroupActiveDefault);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    const groups = NAV_CONTENT.filter((entry): entry is Exclude<NavEntry, NavLeaf> => !isLeaf(entry));
+    return Object.fromEntries(groups.map((entry) => [entry.label, entry.items.some((item) => isActive(pathname, item.href))]));
+  });
 
-  const badgeFor = (item: NavLeaf) => (item.badge === "notification" ? unreadNotifications : item.badge === "contact" ? unreadContacts : 0);
+  const badgeFor = (item: NavLeaf) =>
+    item.badge === "notification" ? unreadNotifications : item.badge === "medicineNotification" ? unreadMedicineNotifications : item.badge === "contact" ? unreadContacts : 0;
 
   return (
     <aside
@@ -95,14 +98,15 @@ export function Sidebar({
           const visibleItems = entry.items.filter((item) => can(role, item.module));
           if (visibleItems.length === 0) return null;
           const groupActive = visibleItems.some((item) => isActive(pathname, item.href));
-          const groupBadge = entry.badge === "notification" ? unreadNotifications : 0;
+          const groupBadge = entry.badge === "notification" ? unreadNotifications : entry.badge === "medicineNotification" ? unreadMedicineNotifications : 0;
+          const isOpen = openGroups[entry.label] ?? false;
 
           return (
             <div key={entry.label}>
               <button
                 type="button"
-                onClick={() => setEquipOpen((v) => !v)}
-                aria-expanded={equipOpen}
+                onClick={() => setOpenGroups((g) => ({ ...g, [entry.label]: !g[entry.label] }))}
+                aria-expanded={isOpen}
                 className={`mb-0.5 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
                   groupActive ? "bg-white/6 text-white" : "text-[#c3d1cb] hover:bg-white/6 hover:text-white"
                 }`}
@@ -110,9 +114,9 @@ export function Sidebar({
                 <entry.icon size={18} className="shrink-0" />
                 <span className="flex-1 text-left">{entry.label}</span>
                 {groupBadge > 0 && <span className="rounded-full bg-danger px-1.5 py-0.5 text-[10px] font-bold text-white">{groupBadge > 9 ? "9+" : groupBadge}</span>}
-                <ChevronDown size={14} className={`transition-transform ${equipOpen ? "" : "-rotate-90"}`} />
+                <ChevronDown size={14} className={`transition-transform ${isOpen ? "" : "-rotate-90"}`} />
               </button>
-              {equipOpen && (
+              {isOpen && (
                 <div className="mb-1 flex flex-col">
                   {visibleItems.map((item) => (
                     <Leaf key={item.href} item={item} active={isActive(pathname, item.href)} badgeCount={badgeFor(item)} sub onNavigate={onNavigate} />

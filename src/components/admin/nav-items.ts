@@ -14,6 +14,7 @@ import {
   Network,
   Newspaper,
   Package,
+  Pill,
   Settings,
   Tags,
   UserCog,
@@ -25,12 +26,12 @@ export type NavLeaf = {
   label: string;
   href: string;
   icon: LucideIcon;
-  badge?: "notification" | "contact";
+  badge?: "notification" | "medicineNotification" | "contact";
 };
 
 export type NavEntry =
   | NavLeaf
-  | { kind: "group"; label: string; icon: LucideIcon; badge?: "notification"; items: NavLeaf[] };
+  | { kind: "group"; label: string; icon: LucideIcon; badge?: "notification" | "medicineNotification"; items: NavLeaf[] };
 
 /** Mirrors partials/admin-sidebar.blade.php: a flat "จัดการเนื้อหา" section, a
  * collapsible "ครุภัณฑ์" sub-group within it, then a "ระบบ" section. */
@@ -58,6 +59,19 @@ export const NAV_CONTENT: NavEntry[] = [
       { module: "equipmentborrow", label: "ยืม-คืนครุภัณฑ์", href: "/admin/equipment-borrow", icon: ArrowLeftRight },
       { module: "equipment", label: "ตรวจนับครุภัณฑ์", href: "/admin/equipment-stock-take", icon: ClipboardCheck },
       { module: "notification", label: "การแจ้งเตือน", href: "/admin/notification", icon: Bell, badge: "notification" },
+    ],
+  },
+  {
+    kind: "group",
+    label: "คลังยา",
+    icon: Pill,
+    badge: "medicineNotification",
+    items: [
+      { module: "medicine", label: "หน้าแรก", href: "/admin/medicine/dashboard", icon: LayoutGrid },
+      { module: "medicine", label: "รายการยาทั้งหมด", href: "/admin/medicine", icon: Pill },
+      { module: "medicinecategory", label: "หมวดหมู่ยา", href: "/admin/medicine-category", icon: Tags },
+      { module: "medicinedispense", label: "จ่ายยา / ประวัติการใช้", href: "/admin/medicine-dispense", icon: ArrowLeftRight },
+      { module: "medicine", label: "ตรวจเช็คสต๊อกยา", href: "/admin/medicine-checklist", icon: ClipboardCheck },
     ],
   },
   { module: "banner", label: "เพิ่มรูปภาพหน้าหลัก", href: "/admin/banner", icon: Images },

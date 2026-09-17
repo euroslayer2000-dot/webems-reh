@@ -22,6 +22,9 @@ export const modulePermissions: Record<string, Role[]> = {
   equipment: ["superadmin", "admin", "editor"],
   equipmentcategory: ["superadmin", "admin", "editor"],
   equipmentborrow: ["superadmin", "admin", "editor"],
+  medicine: ["superadmin", "admin", "editor"],
+  medicinecategory: ["superadmin", "admin", "editor"],
+  medicinedispense: ["superadmin", "admin", "editor"],
   notification: ["superadmin", "admin", "editor"],
 
   contact: ["superadmin", "admin"],

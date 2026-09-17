@@ -280,9 +280,152 @@ model PatientReport {
   note                 String?  @db.Text
   created_at           DateTime @default(now()) @db.Timestamp(0)
   updated_at           DateTime @updatedAt @db.Timestamp(0)
+  medicine_dispenses   MedicineDispense[]
 
   @@index([report_date], map: "idx_patient_reports_date")
   @@map("patient_reports")
+}
+
+model MedicineCategory {
+  id         Int        @id @default(autoincrement())
+  code       String     @unique(map: "uq_medicine_cat_code") @db.VarChar(20)
+  name       String     @db.VarChar(120)
+  sort_order Int        @default(0)
+  medicines  Medicine[]
+
+  @@map("medicine_categories")
+}
+
+model Medicine {
+  id                Int                         @id @default(autoincrement())
+  category_id       Int?
+  code              String                      @unique(map: "uq_medicine_code") @db.VarChar(50)
+  generic_name      String                      @db.VarChar(200)
+  trade_name        String?                     @db.VarChar(200)
+  dosage_form       String?                     @db.VarChar(80)
+  strength          String?                     @db.VarChar(80)
+  unit              String                      @default("เม็ด") @db.VarChar(30)
+  classification    medicine_classification      @default(general)
+  storage_condition medicine_storage_condition   @default(room_temp)
+  min_stock         Int                         @default(0)
+  photo             String?                     @db.VarChar(255)
+  description       String?                     @db.Text
+  is_active         Boolean                     @default(true)
+  created_at        DateTime                    @default(now()) @db.Timestamp(0)
+  category          MedicineCategory?           @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "fk_medicine_category")
+  batches           MedicineBatch[]
+  checklist_items   MedicineChecklistItem[]
+  notifications     MedicineNotification[]
+
+  @@index([category_id], map: "idx_medicine_category")
+  @@index([classification], map: "idx_medicine_classification")
+  @@map("medicines")
+}
+
+model MedicineBatch {
+  id               Int                    @id @default(autoincrement())
+  medicine_id      Int
+  lot_no           String                 @db.VarChar(80)
+  expiry_date      DateTime               @db.Date
+  quantity_on_hand Int                    @default(0)
+  location         String?                @db.VarChar(150)
+  supplier         String?                @db.VarChar(150)
+  purchase_price   Decimal?               @db.Decimal(12, 2)
+  received_date    DateTime?              @db.Date
+  created_at       DateTime               @default(now()) @db.Timestamp(0)
+  medicine         Medicine               @relation(fields: [medicine_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_batch_medicine")
+  stock_logs       MedicineStockLog[]
+  dispenses        MedicineDispense[]
+  notifications    MedicineNotification[]
+
+  @@index([medicine_id], map: "idx_batch_medicine")
+  @@index([expiry_date], map: "idx_batch_expiry")
+  @@map("medicine_batches")
+}
+
+model MedicineStockLog {
+  id            Int                                @id @default(autoincrement())
+  batch_id      Int
+  movement_type medicine_stock_logs_movement_type
+  qty_change    Int
+  performed_by  String                             @db.VarChar(150)
+  note          String?                            @db.VarChar(255)
+  created_at    DateTime                           @default(now()) @db.Timestamp(0)
+  batch         MedicineBatch                      @relation(fields: [batch_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_stock_log_batch")
+
+  @@index([batch_id], map: "idx_stock_log_batch")
+  @@map("medicine_stock_logs")
+}
+
+model MedicineDispense {
+  id                Int             @id @default(autoincrement())
+  batch_id          Int
+  qty               Int
+  used_by           String          @db.VarChar(150)
+  used_at           DateTime        @db.Timestamp(0)
+  station           String?         @db.VarChar(150)
+  patient_report_id Int?
+  witness_name      String?         @db.VarChar(150)
+  note              String?         @db.Text
+  created_at        DateTime        @default(now()) @db.Timestamp(0)
+  batch             MedicineBatch   @relation(fields: [batch_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_dispense_batch")
+  patient_report    PatientReport?  @relation(fields: [patient_report_id], references: [id], onUpdate: Restrict, map: "fk_dispense_patient_report")
+
+  @@index([batch_id], map: "idx_dispense_batch")
+  @@index([patient_report_id], map: "idx_dispense_patient_report")
+  @@index([used_at], map: "idx_dispense_used_at")
+  @@map("medicine_dispenses")
+}
+
+model MedicineChecklist {
+  id           Int                     @id @default(autoincrement())
+  title        String                  @db.VarChar(200)
+  started_at   DateTime                @default(now()) @db.Timestamp(0)
+  completed_at DateTime?               @db.Timestamp(0)
+  note         String?                 @db.Text
+  created_at   DateTime                @default(now()) @db.Timestamp(0)
+  items        MedicineChecklistItem[]
+
+  @@map("medicine_checklists")
+}
+
+model MedicineChecklistItem {
+  id                      Int                                   @id @default(autoincrement())
+  checklist_id            Int
+  medicine_id             Int
+  expected_qty            Int                                   @default(0)
+  actual_qty              Int?
+  checked                 Boolean                               @default(false)
+  checked_at              DateTime?                             @db.Timestamp(0)
+  expiry_flag             medicine_checklist_items_expiry_flag?
+  snapshot_nearest_expiry DateTime?                              @db.Date
+  note                    String?                               @db.VarChar(255)
+  checklist               MedicineChecklist                     @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_checklist_item_session")
+  medicine                Medicine                              @relation(fields: [medicine_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_checklist_item_medicine")
+
+  @@unique([checklist_id, medicine_id], map: "uq_checklist_item")
+  @@index([medicine_id], map: "idx_checklist_item_medicine")
+  @@map("medicine_checklist_items")
+}
+
+model MedicineNotification {
+  id                Int                          @id @default(autoincrement())
+  type              medicine_notifications_type
+  level             notifications_level
+  medicine_id       Int?
+  medicine_batch_id Int?
+  title             String                       @db.VarChar(255)
+  message           String                       @db.VarChar(500)
+  is_read           Boolean                      @default(false)
+  created_at        DateTime                     @default(now()) @db.Timestamp(0)
+  updated_at        DateTime                     @updatedAt @db.Timestamp(0)
+  medicine          Medicine?                    @relation(fields: [medicine_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_med_notif_medicine")
+  medicine_batch    MedicineBatch?               @relation(fields: [medicine_batch_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_med_notif_batch")
+
+  @@unique([type, medicine_batch_id], map: "uq_med_notif_type_batch")
+  @@unique([type, medicine_id], map: "uq_med_notif_type_medicine")
+  @@index([is_read], map: "idx_med_notif_is_read")
+  @@map("medicine_notifications")
 }
 
 model Personnel {
@@ -405,4 +548,38 @@ enum equipment_status {
   damaged     @map("ชำรุด")
   maintenance @map("ซ่อมบำรุง")
   disposed    @map("จำหน่ายแล้ว")
+}
+
+enum medicine_classification {
+  general         @map("ทั่วไป")
+  dangerous       @map("ยาอันตราย")
+  special_control @map("ยาควบคุมพิเศษ")
+  psychotropic    @map("วัตถุออกฤทธิ์ต่อจิต")
+  narcotic        @map("ยาเสพติด")
+}
+
+enum medicine_storage_condition {
+  room_temp     @map("อุณหภูมิห้อง")
+  refrigerated  @map("แช่เย็น")
+  protect_light @map("เก็บให้พ้นแสง")
+}
+
+enum medicine_stock_logs_movement_type {
+  received
+  dispensed
+  adjusted
+  expired_writeoff
+  lost
+}
+
+enum medicine_checklist_items_expiry_flag {
+  normal
+  near_expiry
+  expired
+}
+
+enum medicine_notifications_type {
+  medicine_expiring
+  medicine_expired
+  medicine_low_stock
 }
