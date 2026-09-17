@@ -12,6 +12,7 @@ export function ImageFileField({
   error,
   currentImageUrl,
   accept = "image/*",
+  previewVariant = "thumb",
 }: {
   label: string;
   id: string;
@@ -20,6 +21,12 @@ export function ImageFileField({
   error?: string;
   currentImageUrl?: string | null;
   accept?: string;
+  /** "thumb" (default): small cropped square, used everywhere. "wide": a
+   * large preview that shows the full image at its own aspect ratio (no
+   * cropping), mirroring how PopupBannerModal sizes the frame to the
+   * picture on the public site — use this where admins need to see the
+   * whole image before saving. */
+  previewVariant?: "thumb" | "wide";
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [sizeError, setSizeError] = useState<string | null>(null);
@@ -53,6 +60,26 @@ export function ImageFileField({
   }
 
   const displaySrc = preview ?? currentImageUrl ?? null;
+
+  if (previewVariant === "wide") {
+    return (
+      <FormField label={label} htmlFor={id} required={required} error={sizeError ?? error}>
+        <input id={id} name={name} type="file" accept={accept} onChange={handleChange} className={inputClass} />
+        {displaySrc && (
+          <div className="mt-3">
+            <div className="inline-block max-w-full overflow-hidden rounded-lg border border-border bg-bg-soft p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element -- object URL preview, next/image can't optimize it */}
+              <img src={displaySrc} alt="ตัวอย่างรูปภาพ" className="block h-auto max-h-[420px] w-auto max-w-full" />
+            </div>
+            <p className="mt-1.5 text-xs text-text-muted">
+              ตัวอย่างรูปเต็ม ไม่มีการครอบตัด — กรอบป๊อปอัพบนหน้าเว็บจะปรับขนาดตามสัดส่วนจริงของรูปนี้โดยอัตโนมัติ (กว้างสูงสุด 1700px)
+              {preview && !sizeError && " (ยังไม่ได้บันทึก ตรวจสอบให้ถูกต้องก่อนกดบันทึก)"}
+            </p>
+          </div>
+        )}
+      </FormField>
+    );
+  }
 
   return (
     <FormField label={label} htmlFor={id} required={required} error={sizeError ?? error}>

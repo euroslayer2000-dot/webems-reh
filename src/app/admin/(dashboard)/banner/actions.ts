@@ -8,6 +8,13 @@ import { redirectWithFlash } from "@/lib/flash-redirect";
 
 const MAX_HERO_IMAGES = 5;
 
+/** Every Banner row belongs to a position (hero carousel vs. entry popup),
+ * each managed on its own admin page — route mutations back to whichever
+ * page the row actually belongs to instead of hardcoding "/admin/banner". */
+function pathFor(position: string): string {
+  return position === "popup" ? "/admin/popup-banner" : "/admin/banner";
+}
+
 const bannerSchema = z.object({
   title: z.string().max(200).optional(),
   link_url: z.string().max(255).optional(),
@@ -50,6 +57,30 @@ export async function quickCreateBanner(formData: FormData): Promise<void> {
   redirectWithFlash("/admin/banner", "เพิ่มรูปภาพหน้าหลักเรียบร้อยแล้ว");
 }
 
+export async function createPopupBanner(_prev: BannerFormState, formData: FormData): Promise<BannerFormState> {
+  await requireActionAccess("banner");
+  const parsed = parse(formData);
+  if (!parsed.success) return { ok: false };
+
+  const image = formData.get("image");
+  if (!(image instanceof File) || image.size === 0) return { ok: false, errors: { image: "กรุณาเลือกรูปภาพ" } };
+  const imagePath = await saveUpload(image, "banners");
+  const count = await prisma.banner.count({ where: { position: "popup" } });
+
+  await prisma.banner.create({
+    data: {
+      title: parsed.data.title || null,
+      link_url: parsed.data.link_url || null,
+      position: "popup",
+      sort_order: count,
+      is_active: formData.get("is_active") === "on",
+      image: imagePath,
+    },
+  });
+
+  redirectWithFlash("/admin/popup-banner", "เพิ่มป๊อปอัพเรียบร้อยแล้ว");
+}
+
 export async function updateBanner(id: number, _prev: BannerFormState, formData: FormData): Promise<BannerFormState> {
   await requireActionAccess("banner");
   const existing = await prisma.banner.findUniqueOrThrow({ where: { id } });
@@ -73,7 +104,7 @@ export async function updateBanner(id: number, _prev: BannerFormState, formData:
   });
   if (imagePath !== existing.image) await deleteUpload(existing.image);
 
-  redirectWithFlash("/admin/banner", "บันทึกการแก้ไขเรียบร้อยแล้ว");
+  redirectWithFlash(pathFor(existing.position), "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }
 
 export async function moveBanner(formData: FormData): Promise<void> {
@@ -97,7 +128,7 @@ export async function moveBanner(formData: FormData): Promise<void> {
     );
   }
 
-  redirectWithFlash("/admin/banner", "จัดลำดับใหม่เรียบร้อยแล้ว");
+  redirectWithFlash(pathFor(current.position), "จัดลำดับใหม่เรียบร้อยแล้ว");
 }
 
 export async function toggleBanner(formData: FormData): Promise<void> {
@@ -106,7 +137,7 @@ export async function toggleBanner(formData: FormData): Promise<void> {
   const banner = await prisma.banner.findUniqueOrThrow({ where: { id } });
   await prisma.banner.update({ where: { id }, data: { is_active: !banner.is_active } });
 
-  redirectWithFlash("/admin/banner", "เปลี่ยนสถานะเรียบร้อยแล้ว");
+  redirectWithFlash(pathFor(banner.position), "เปลี่ยนสถานะเรียบร้อยแล้ว");
 }
 
 export async function deleteBanner(formData: FormData): Promise<void> {
@@ -117,5 +148,5 @@ export async function deleteBanner(formData: FormData): Promise<void> {
   await deleteUpload(banner.image);
   await prisma.banner.delete({ where: { id } });
 
-  redirectWithFlash("/admin/banner", "ลบรูปภาพเรียบร้อยแล้ว");
+  redirectWithFlash(pathFor(banner.position), "ลบรูปภาพเรียบร้อยแล้ว");
 }

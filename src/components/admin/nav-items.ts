@@ -9,6 +9,7 @@ import {
   Images,
   LayoutGrid,
   MapPin,
+  Megaphone,
   MessageCircle,
   Network,
   Newspaper,
@@ -60,6 +61,7 @@ export const NAV_CONTENT: NavEntry[] = [
     ],
   },
   { module: "banner", label: "เพิ่มรูปภาพหน้าหลัก", href: "/admin/banner", icon: Images },
+  { module: "banner", label: "ป๊อปอัพหน้าเว็บ", href: "/admin/popup-banner", icon: Megaphone },
 ];
 
 export const NAV_SYSTEM: NavLeaf[] = [
