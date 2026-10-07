@@ -80,7 +80,7 @@ export default async function HomePage() {
       {/* ------------------------------------------- Welcome + stats hero --- */}
       <section className="py-10">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#FFFAF0] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
+          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
             <Reveal direction="up" className="text-center">
               <p className="font-[Arial,sans-serif] text-[2.78rem] font-normal text-black sm:text-[3.48rem]">WELCOME TO</p>
               <h2 className="mt-1 font-[Arial,sans-serif] text-[2.93rem] font-extrabold text-primary-500 sm:text-[3.51rem]">
@@ -233,14 +233,14 @@ export default async function HomePage() {
       {/* --------------------------------------------------------- About --- */}
       <section className="py-[4.5rem]">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#FFFAF0] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
+          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
             <Reveal className="flex justify-center">
               <Image
                 src="/assets/img/emslogo.jpg"
                 alt="REH101"
                 width={2016}
                 height={1074}
-                className="h-auto w-[2016px] max-w-full"
+                className="h-auto w-[2016px] max-w-full rounded-[var(--radius-lg)]"
               />
             </Reveal>
           </div>
