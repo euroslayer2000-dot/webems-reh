@@ -61,10 +61,10 @@ export default async function HomePage() {
   const emergencyPhone = settings.emergency_phone || "1669";
 
   const stats = [
-    { icon: Users, label: "จำนวนผู้ป่วยต่อปี", value: patientStats._sum.patient_count ?? 0 },
-    { icon: Users, label: "จำนวนผู้ป่วยฉุกเฉิน", value: patientStats._sum.emergency_count ?? 0 },
-    { icon: Users, label: "จำนวนผู้บาดเจ็บจราจร", value: patientStats._sum.traffic_injury_count ?? 0 },
-    { icon: Users, label: "จำนวนผู้บาดเจ็บอุบัติเหตุทั่วไป", value: patientStats._sum.general_injury_count ?? 0 },
+    { image: "/assets/img/3.jpg", label: "จำนวนผู้ป่วยต่อปี", value: patientStats._sum.patient_count ?? 0 },
+    { image: "/assets/img/4.jpg", label: "จำนวนผู้ป่วยฉุกเฉิน", value: patientStats._sum.emergency_count ?? 0 },
+    { image: "/assets/img/2.jpg", label: "จำนวนผู้บาดเจ็บจราจร", value: patientStats._sum.traffic_injury_count ?? 0 },
+    { image: "/assets/img/1.jpg", label: "จำนวนผู้บาดเจ็บอุบัติเหตุทั่วไป", value: patientStats._sum.general_injury_count ?? 0 },
   ];
 
   const quickLinks = [
@@ -81,7 +81,7 @@ export default async function HomePage() {
       {/* ------------------------------------------- Welcome + stats hero --- */}
       <section className="py-10">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#FFBBDA] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
+          <div className="rounded-[var(--radius-xl)] bg-[#FFFAF0] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
             <Reveal direction="up" className="text-center">
               <p className="font-[Arial,sans-serif] text-[2.78rem] font-normal text-black sm:text-[3.48rem]">WELCOME TO</p>
               <h2 className="mt-1 font-[Arial,sans-serif] text-[2.93rem] font-extrabold text-primary-500 sm:text-[3.51rem]">
@@ -92,12 +92,8 @@ export default async function HomePage() {
             <div className="mt-10 grid grid-cols-2 gap-6 lg:grid-cols-4">
               {stats.map((stat, i) => (
                 <Reveal key={stat.label} direction="zoom" delay={i * 100} className="p-4 text-center">
-                  <span
-                    className={`mx-auto mb-3 grid h-16 w-16 place-items-center rounded-full bg-white shadow-[var(--shadow-sm)] ${
-                      i % 2 === 0 ? "text-primary-600" : "text-accent-600"
-                    }`}
-                  >
-                    <stat.icon size={28} strokeWidth={1.75} />
+                  <span className="mx-auto mb-3 grid h-16 w-16 place-items-center overflow-hidden rounded-full bg-white shadow-[var(--shadow-sm)]">
+                    <Image src={stat.image} alt={stat.label} width={56} height={56} className="h-14 w-14 object-contain" />
                   </span>
                   <div className="text-[2.4rem] leading-none font-extrabold text-[#1a2b32]">
                     {stat.value.toLocaleString("th-TH")}
@@ -238,7 +234,7 @@ export default async function HomePage() {
       {/* --------------------------------------------------------- About --- */}
       <section className="py-[4.5rem]">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#FFBBDA] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
+          <div className="rounded-[var(--radius-xl)] bg-[#FFFAF0] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
             <div className="grid items-center gap-12 lg:grid-cols-[340px_1fr]">
               <Reveal direction="right" className="relative mx-auto w-fit">
                 <Image
