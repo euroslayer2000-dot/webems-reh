@@ -108,7 +108,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------- Quick links --- */}
       <section className="bg-surface py-12">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] p-6 shadow-[var(--shadow-lg)]">
+          <div className="rounded-[var(--radius-xl)] bg-primary-500 p-6 shadow-[var(--shadow-lg)]">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {quickLinks.map((ql, i) => (
                 <Reveal key={ql.title} direction="up" delay={i * 80}>
@@ -166,7 +166,7 @@ export default async function HomePage() {
       {/* ----------------------------------------------------- Courses --- */}
       <section className="py-[4.5rem]">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] p-6 shadow-[var(--shadow-lg)]">
+          <div className="rounded-[var(--radius-xl)] bg-primary-500 p-6 shadow-[var(--shadow-lg)]">
             <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตรการเรียน" /></Reveal>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal direction="up" delay={0}>
@@ -203,30 +203,42 @@ export default async function HomePage() {
         <section className="bg-surface py-[4.5rem]">
           <Container>
             <Reveal direction="up"><SectionTitle eyebrow="Gallery" eyebrowClassName="bg-[#FFBBDA] text-accent-600" title="ภาพกิจกรรม" /></Reveal>
-            <div className="flex flex-wrap gap-3">
-              {galleries.map((gallery, i) => (
-                <Reveal
-                  key={gallery.id}
-                  direction="up"
-                  delay={(i % 6) * 60}
-                  className="aspect-[4/3] w-[calc(65%-0.375rem)] md:w-[calc(43.333%-0.5rem)] lg:w-[calc(21.667%-0.6rem)]"
-                >
-                  <Link href="/gallery" className="group relative block h-full w-full overflow-hidden rounded-[var(--radius)] bg-bg-soft">
-                    <Image
-                      src={uploadUrl(gallery.cover_image)}
-                      alt={gallery.title}
-                      fill
-                      sizes="(max-width: 768px) 65vw, (max-width: 1024px) 43vw, 22vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-white/94 to-transparent to-60% p-4 font-semibold text-[#1a2b32] opacity-0 transition-opacity group-hover:opacity-100">
-                      <span>{gallery.title}</span>
-                    </div>
-                  </Link>
-                </Reveal>
-              ))}
-            </div>
           </Container>
+          {/* CSS slideshow: one row sliding left, 6s per image */}
+          <div className="gallery-slider overflow-hidden">
+            {(() => {
+              const repeat = Math.max(1, Math.ceil(8 / galleries.length));
+              const items = Array.from({ length: repeat }, () => galleries).flat();
+              const copies = [0, 1];
+              return (
+                <div className="gallery-track" style={{ animationDuration: `${items.length * 6}s` }}>
+                  {copies.map((copy) => (
+                    <div key={copy} className="flex shrink-0 gap-3 pr-3" aria-hidden={copy === 1}>
+                      {items.map((gallery, i) => (
+                        <Link
+                          key={`${copy}-${i}`}
+                          href="/gallery"
+                          tabIndex={copy === 1 ? -1 : undefined}
+                          className="group relative block aspect-[4/3] w-[65vw] shrink-0 overflow-hidden rounded-[var(--radius)] bg-bg-soft md:w-[43vw] lg:w-[22vw]"
+                        >
+                          <Image
+                            src={uploadUrl(gallery.cover_image)}
+                            alt={copy === 1 ? "" : gallery.title}
+                            fill
+                            sizes="(max-width: 768px) 65vw, (max-width: 1024px) 43vw, 22vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-white/94 to-transparent to-60% p-4 font-semibold text-[#1a2b32] opacity-0 transition-opacity group-hover:opacity-100">
+                            <span>{gallery.title}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
         </section>
       )}
 

@@ -140,6 +140,25 @@ body {
   50% { transform: translateY(-26px); }
 }
 
+@keyframes gallery-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.gallery-track {
+  display: flex;
+  width: max-content;
+  animation: gallery-slide linear infinite;
+}
+
+.gallery-slider:hover .gallery-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-track { animation: none; }
+}
+
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.5); }
   70% { box-shadow: 0 0 0 10px rgba(229, 72, 77, 0); }
