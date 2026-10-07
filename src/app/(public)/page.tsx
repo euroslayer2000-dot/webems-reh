@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
   FileDown,
   MessageCircle,
   PhoneCall,
@@ -235,42 +234,15 @@ export default async function HomePage() {
       <section className="py-[4.5rem]">
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-[#FFFAF0] px-4 py-10 shadow-[var(--shadow-lg)] sm:px-8 sm:py-12">
-            <div className="grid items-center gap-12 lg:grid-cols-[340px_1fr]">
-              <Reveal direction="right" className="relative mx-auto w-fit">
-                <Image
-                  src="/assets/img/reh8.jpg"
-                  alt="แนะนำหน่วยงาน"
-                  width={819}
-                  height={2048}
-                  className="h-auto w-[340px] max-w-full rounded-[var(--radius-lg)] bg-surface object-contain shadow-[var(--shadow-lg)]"
-                />
-              </Reveal>
-
-              <Reveal direction="left">
-                <div className="rounded-[var(--radius-lg)] bg-white p-6 shadow-[var(--shadow-md)] sm:p-8 lg:mx-auto lg:w-[calc(100%-200px)]">
-                  <span className="mb-3 inline-block text-sm font-bold tracking-[0.12em] text-accent-500 uppercase">ABOUT US</span>
-                  <h2 className="mb-3 text-2xl font-bold text-text">เกี่ยวกับหน่วยกู้ชีพ REH101</h2>
-                  <p className="text-text-muted">
-                    เราคือหน่วยบริการการแพทย์ฉุกเฉินที่มุ่งมั่นให้บริการช่วยเหลือผู้ป่วยฉุกเฉิน ณ จุดเกิดเหตุอย่างรวดเร็วและมีมาตรฐาน
-                    ด้วยทีมบุคลากรที่ผ่านการฝึกอบรมและอุปกรณ์การแพทย์ที่ทันสมัย
-                  </p>
-                  <div className="mt-6 flex flex-col gap-3.5">
-                    <div className="flex gap-3">
-                      <BadgeCheck size={20} className="mt-0.5 shrink-0 text-primary-500" />
-                      <div><strong className="text-text">ทีมกู้ชีพมืออาชีพ</strong> — EMT และ Paramedic ที่ผ่านการรับรอง</div>
-                    </div>
-                    <div className="flex gap-3">
-                      <BadgeCheck size={20} className="mt-0.5 shrink-0 text-primary-500" />
-                      <div><strong className="text-text">ตอบสนองรวดเร็ว</strong> — พร้อมออกปฏิบัติการทันทีเมื่อได้รับแจ้ง</div>
-                    </div>
-                    <div className="flex gap-3">
-                      <BadgeCheck size={20} className="mt-0.5 shrink-0 text-primary-500" />
-                      <div><strong className="text-text">อุปกรณ์ครบครัน</strong> — รถพยาบาลและเครื่องมือแพทย์มาตรฐาน</div>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
+            <Reveal className="flex justify-center">
+              <Image
+                src="/assets/img/emslogo.jpg"
+                alt="REH101"
+                width={2016}
+                height={1074}
+                className="h-auto w-[2016px] max-w-full"
+              />
+            </Reveal>
           </div>
         </Container>
       </section>
