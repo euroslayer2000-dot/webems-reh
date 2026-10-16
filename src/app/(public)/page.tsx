@@ -248,11 +248,12 @@ export default async function HomePage() {
           <div className="rounded-[var(--radius-xl)] bg-[#F0FFF0] p-6 shadow-[var(--shadow-lg)]">
             <Reveal className="flex justify-center">
               <Image
-                src="/assets/img/emslogo.jpg"
+                src="/assets/img/emslogo2.jpg"
                 alt="REH101"
-                width={2016}
-                height={1074}
-                className="h-auto w-[2016px] max-w-full rounded-[var(--radius-lg)]"
+                width={973}
+                height={555}
+                unoptimized
+                className="h-auto w-[973px] max-w-full rounded-[var(--radius-lg)]"
               />
             </Reveal>
           </div>
