@@ -80,7 +80,7 @@ export default async function HomePage() {
       {/* ------------------------------------------- Welcome + stats hero --- */}
       <section className="py-10">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] p-6 shadow-[var(--shadow-lg)]">
+          <div className="rounded-[var(--radius-xl)] bg-[#F0FFF0] p-6 shadow-[var(--shadow-lg)]">
             <Reveal direction="up" className="text-center">
               <p className="font-[Arial,sans-serif] text-[2.78rem] font-normal text-black sm:text-[3.48rem]">WELCOME TO</p>
               <h2 className="mt-1 font-[Arial,sans-serif] text-[2.93rem] font-extrabold text-primary-500 sm:text-[3.51rem]">
@@ -167,7 +167,7 @@ export default async function HomePage() {
       <section className="py-[4.5rem]">
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-primary-500 p-6 shadow-[var(--shadow-lg)]">
-            <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตรการเรียน" /></Reveal>
+            <Reveal direction="up"><SectionTitle eyebrow="Courses" title="หลักสูตรการเรียน" titleClassName="text-white" /></Reveal>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal direction="up" delay={0}>
                 <CourseHighlightCard
@@ -245,7 +245,7 @@ export default async function HomePage() {
       {/* --------------------------------------------------------- About --- */}
       <section className="py-[4.5rem]">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#F8F8FF] p-6 shadow-[var(--shadow-lg)]">
+          <div className="rounded-[var(--radius-xl)] bg-[#F0FFF0] p-6 shadow-[var(--shadow-lg)]">
             <Reveal className="flex justify-center">
               <Image
                 src="/assets/img/emslogo.jpg"
