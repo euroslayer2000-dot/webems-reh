@@ -245,7 +245,6 @@ export default async function HomePage() {
       {/* --------------------------------------------------------- About --- */}
       <section className="py-[4.5rem]">
         <Container>
-          <div className="rounded-[var(--radius-xl)] bg-[#F0FFF0] p-6 shadow-[var(--shadow-lg)]">
             <Reveal className="flex justify-center">
               <Image
                 src="/assets/img/emslogo2.jpg"
@@ -256,7 +255,6 @@ export default async function HomePage() {
                 className="h-auto w-[973px] max-w-full rounded-[var(--radius-lg)]"
               />
             </Reveal>
-          </div>
         </Container>
       </section>
     </div>
