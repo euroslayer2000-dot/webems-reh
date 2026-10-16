@@ -78,7 +78,7 @@ export default async function HomePage() {
       {heroBanners.length > 0 && <HeroBannerCarousel banners={heroBanners} />}
 
       {/* ------------------------------------------- Welcome + stats hero --- */}
-      <section className="bg-[#F0FFF0] py-10">
+      <section className="py-10">
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-[#F0FFF0] p-6 shadow-[var(--shadow-lg)]">
             <Reveal direction="up" className="text-center">
@@ -106,7 +106,7 @@ export default async function HomePage() {
       </section>
 
       {/* ---------------------------------------------------- Quick links --- */}
-      <section className="bg-[#F0FFF0] py-12">
+      <section className="bg-surface py-12">
         <Container>
           <div className="rounded-[var(--radius-xl)] bg-primary-500 p-6 shadow-[var(--shadow-lg)]">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -243,7 +243,7 @@ export default async function HomePage() {
       )}
 
       {/* --------------------------------------------------------- About --- */}
-      <section className="bg-[#F0FFF0] py-[4.5rem]">
+      <section className="py-[4.5rem]">
         <Container>
             <Reveal className="flex justify-center">
               <Image
