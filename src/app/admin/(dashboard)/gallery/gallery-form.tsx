@@ -8,7 +8,7 @@ import { ImageFileField } from "@/components/admin/image-file-field";
 import { uploadUrl } from "@/lib/upload";
 import { createGallery, updateGallery, type GalleryFormState } from "./actions";
 
-type GalleryRecord = { id: number; title: string; slug: string; description: string | null; cover_image: string | null };
+type GalleryRecord = { id: number; title: string; slug: string; description: string | null; reference: string | null; cover_image: string | null };
 
 const initialState: GalleryFormState = { ok: false };
 
@@ -30,6 +30,10 @@ export function GalleryForm({ gallery }: { gallery: GalleryRecord | null }) {
 
           <FormField label="คำอธิบาย" htmlFor="description">
             <textarea id="description" name="description" rows={3} defaultValue={gallery?.description ?? ""} className={inputClass} />
+          </FormField>
+
+          <FormField label="อ้างอิง" htmlFor="reference">
+            <input id="reference" name="reference" defaultValue={gallery?.reference ?? ""} placeholder="เช่น ที่มาของภาพ / ผู้ถ่ายภาพ" className={inputClass} />
           </FormField>
 
           <ImageFileField

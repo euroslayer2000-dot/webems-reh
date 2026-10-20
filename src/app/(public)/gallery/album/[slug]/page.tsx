@@ -49,6 +49,8 @@ export default async function GalleryAlbumPage({ params }: { params: Promise<{ s
           />
         )}
 
+        {gallery.reference && <p className="mt-6 text-left text-sm text-text-muted">อ้างอิง: {gallery.reference}</p>}
+
         <Link href="/gallery" className="mt-10 inline-block text-sm font-semibold text-primary-600 hover:underline">
           ← กลับไปหน้าแกลเลอรีทั้งหมด
         </Link>

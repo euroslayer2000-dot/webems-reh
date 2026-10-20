@@ -11,6 +11,7 @@ const gallerySchema = z.object({
   title: z.string().min(1, "กรุณากรอกชื่ออัลบั้ม").max(200),
   slug: z.string().optional(),
   description: z.string().optional(),
+  reference: z.string().max(500).optional(),
 });
 
 export type GalleryFormState = { ok: boolean; errors?: { title?: string } };
@@ -30,6 +31,7 @@ export async function createGallery(_prev: GalleryFormState, formData: FormData)
     title: formData.get("title"),
     slug: formData.get("slug") || undefined,
     description: formData.get("description") || undefined,
+    reference: formData.get("reference") || undefined,
   });
   if (!parsed.success) return { ok: false, errors: { title: parsed.error.issues[0]?.message } };
 
@@ -40,7 +42,7 @@ export async function createGallery(_prev: GalleryFormState, formData: FormData)
   const coverImagePath = coverImage instanceof File && coverImage.size > 0 ? await saveUpload(coverImage, "gallery") : null;
 
   const gallery = await prisma.gallery.create({
-    data: { title: parsed.data.title, slug, description: parsed.data.description || null, cover_image: coverImagePath },
+    data: { title: parsed.data.title, slug, description: parsed.data.description || null, reference: parsed.data.reference || null, cover_image: coverImagePath },
   });
 
   redirectWithFlash(`/admin/gallery/${gallery.id}/edit`, "สร้างอัลบั้มแล้ว ทำการเพิ่มรูปภาพได้เลย");
@@ -54,6 +56,7 @@ export async function updateGallery(id: number, _prev: GalleryFormState, formDat
     title: formData.get("title"),
     slug: formData.get("slug") || undefined,
     description: formData.get("description") || undefined,
+    reference: formData.get("reference") || undefined,
   });
   if (!parsed.success) return { ok: false, errors: { title: parsed.error.issues[0]?.message } };
 
@@ -68,7 +71,7 @@ export async function updateGallery(id: number, _prev: GalleryFormState, formDat
 
   await prisma.gallery.update({
     where: { id },
-    data: { title: parsed.data.title, slug, description: parsed.data.description || null, cover_image: coverImagePath },
+    data: { title: parsed.data.title, slug, description: parsed.data.description || null, reference: parsed.data.reference || null, cover_image: coverImagePath },
   });
   if (coverImagePath !== existing.cover_image) await deleteUpload(existing.cover_image);
 

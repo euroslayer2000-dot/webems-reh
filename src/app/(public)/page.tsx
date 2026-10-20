@@ -217,7 +217,7 @@ export default async function HomePage() {
                       {items.map((gallery, i) => (
                         <Link
                           key={`${copy}-${i}`}
-                          href="/gallery"
+                          href={`/gallery/album/${gallery.slug}`}
                           tabIndex={copy === 1 ? -1 : undefined}
                           className="group relative block aspect-[4/3] w-[65vw] shrink-0 overflow-hidden rounded-[var(--radius)] bg-bg-soft md:w-[43vw] lg:w-[22vw]"
                         >
