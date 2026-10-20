@@ -13,6 +13,7 @@ type CourseRecord = {
   title: string;
   slug: string;
   short_description: string | null;
+  content: string | null;
   cover_image: string | null;
   is_active: boolean;
 };
@@ -42,6 +43,10 @@ export function CourseForm({ course }: { course: CourseRecord | null }) {
 
           <FormField label="คำอธิบายสั้น" htmlFor="short_description" error={state.errors?.short_description}>
             <textarea id="short_description" name="short_description" rows={3} defaultValue={course?.short_description ?? ""} className={inputClass} />
+          </FormField>
+
+          <FormField label="รายละเอียดหลักสูตร" htmlFor="content" error={state.errors?.content}>
+            <textarea id="content" name="content" rows={10} defaultValue={course?.content ?? ""} placeholder="แสดงทางด้านขวาของรูปภาพในหน้ารายละเอียดหลักสูตร" className={inputClass} />
           </FormField>
 
           <label className="flex w-fit items-center gap-2 text-sm text-text">

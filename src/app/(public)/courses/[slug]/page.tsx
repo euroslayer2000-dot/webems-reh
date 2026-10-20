@@ -33,13 +33,19 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       <PageHero title={course.title} subtitle={course.short_description ?? undefined} />
 
       <Container className="py-12">
-        <div className="relative mx-auto aspect-[16/9] w-full max-w-3xl overflow-hidden rounded-[var(--radius-lg)] bg-bg-soft shadow-[var(--shadow-md)]">
-          <Image src={uploadUrl(course.cover_image)} alt={course.title} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" />
-        </div>
+        <div className="grid items-start gap-8 md:grid-cols-2">
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[var(--radius-lg)] bg-bg-soft shadow-[var(--shadow-md)]">
+            <Image src={uploadUrl(course.cover_image)} alt={course.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          </div>
 
-        {course.short_description && (
-          <p className="mx-auto mt-8 max-w-3xl text-text-muted">{course.short_description}</p>
-        )}
+          <div className="rounded-[var(--radius-lg)] border border-border p-6">
+            <h2 className="text-lg font-bold text-text">{course.title}</h2>
+            {course.short_description && <p className="mt-2 text-text-muted">{course.short_description}</p>}
+            {course.content && (
+              <p className="mt-4 whitespace-pre-wrap leading-relaxed text-text">{course.content}</p>
+            )}
+          </div>
+        </div>
 
         <Link href="/courses" className="mt-10 inline-block text-sm font-semibold text-primary-600 hover:underline">
           ← กลับไปหน้าหลักสูตรทั้งหมด

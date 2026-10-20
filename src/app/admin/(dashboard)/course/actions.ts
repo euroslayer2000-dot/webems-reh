@@ -11,6 +11,7 @@ const courseSchema = z.object({
   title: z.string().min(1, "กรุณากรอกชื่อหลักสูตร").max(200),
   slug: z.string().optional(),
   short_description: z.string().max(500, "คำอธิบายต้องไม่เกิน 500 ตัวอักษร").optional(),
+  content: z.string().max(20000, "รายละเอียดต้องไม่เกิน 20,000 ตัวอักษร").optional(),
 });
 
 export type CourseFormState = {
@@ -32,6 +33,7 @@ function parse(formData: FormData) {
     title: formData.get("title"),
     slug: formData.get("slug") || undefined,
     short_description: formData.get("short_description") || undefined,
+    content: formData.get("content") || undefined,
   });
 }
 
@@ -59,6 +61,7 @@ export async function createCourse(_prev: CourseFormState, formData: FormData): 
       title: parsed.data.title,
       slug,
       short_description: parsed.data.short_description || null,
+      content: parsed.data.content || null,
       cover_image: coverImagePath,
       sort_order: count,
       is_active: formData.get("is_active") === "on",
@@ -90,6 +93,7 @@ export async function updateCourse(id: number, _prev: CourseFormState, formData:
       title: parsed.data.title,
       slug,
       short_description: parsed.data.short_description || null,
+      content: parsed.data.content || null,
       cover_image: coverImagePath,
       is_active: formData.get("is_active") === "on",
     },
