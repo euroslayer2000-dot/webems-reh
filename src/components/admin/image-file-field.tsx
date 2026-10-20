@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { X } from "lucide-react";
 import { MAX_UPLOAD_SIZE_MB } from "@/lib/upload";
 import { FormField, inputClass } from "./form-field";
 
@@ -30,6 +31,7 @@ export function ImageFileField({
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -59,12 +61,33 @@ export function ImageFileField({
     });
   }
 
+  function handleClear() {
+    if (inputRef.current) inputRef.current.value = "";
+    setSizeError(null);
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }
+
   const displaySrc = preview ?? currentImageUrl ?? null;
+  const clearButton = preview && (
+    <button
+      type="button"
+      onClick={handleClear}
+      className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+    >
+      <X size={13} /> ลบรูป
+    </button>
+  );
 
   if (previewVariant === "wide") {
     return (
       <FormField label={label} htmlFor={id} required={required} error={sizeError ?? error}>
-        <input id={id} name={name} type="file" accept={accept} onChange={handleChange} className={inputClass} />
+        <div className="flex items-center gap-2">
+          <input ref={inputRef} id={id} name={name} type="file" accept={accept} onChange={handleChange} className={`${inputClass} flex-1`} />
+          {clearButton}
+        </div>
         {displaySrc && (
           <div className="mt-3">
             <div className="inline-block max-w-full overflow-hidden rounded-lg border border-border bg-bg-soft p-2">
@@ -92,7 +115,8 @@ export function ImageFileField({
             className="h-20 w-20 shrink-0 rounded-lg border border-border bg-bg-soft object-cover"
           />
         )}
-        <input id={id} name={name} type="file" accept={accept} onChange={handleChange} className={`${inputClass} flex-1`} />
+        <input ref={inputRef} id={id} name={name} type="file" accept={accept} onChange={handleChange} className={`${inputClass} flex-1`} />
+        {clearButton}
       </div>
       {preview && !sizeError && <p className="mt-1.5 text-xs text-text-muted">รูปตัวอย่างที่จะอัปโหลด — ตรวจสอบให้ถูกต้องก่อนบันทึก</p>}
     </FormField>
