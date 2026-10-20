@@ -47,17 +47,15 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
 
   return (
     <article>
-      <div className="relative h-72 w-full overflow-hidden bg-bg-soft sm:h-96">
-        <Image src={uploadUrl(article.cover_image)} alt={article.title} fill sizes="100vw" priority className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <Container className="absolute inset-x-0 bottom-0 pb-8 text-white">
+      <div className="bg-bg-soft pb-8 pt-10">
+        <Container>
           {article.category && (
-            <span className="mb-3 inline-block rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold">
+            <span className="mb-3 inline-block rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold text-white">
               {article.category.name}
             </span>
           )}
-          <h1 className="max-w-3xl text-2xl font-bold sm:text-3xl">{article.title}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-white/85">
+          <h1 className="max-w-3xl text-2xl font-bold text-text sm:text-3xl">{article.title}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-text-muted">
             <span className="flex items-center gap-1.5">
               <Calendar size={14} /> {formatDateTh(article.published_at)}
             </span>
@@ -71,6 +69,17 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
             </span>
           </div>
         </Container>
+        <div className="mx-auto mt-6 w-full max-w-[1650px] px-4">
+          <Image
+            src={uploadUrl(article.cover_image)}
+            alt={article.title}
+            width={0}
+            height={0}
+            sizes="(min-width: 1700px) 1650px, 100vw"
+            priority
+            className="h-auto w-full rounded-2xl"
+          />
+        </div>
       </div>
 
       <Container className="py-12">

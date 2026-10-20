@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import type { CircleMarker as LeafletCircleMarker } from "leaflet";
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
+import { ClickToZoom } from "./click-to-zoom";
 import { stationTypeMeta } from "@/lib/format";
 
 export type StationPoint = {
@@ -49,7 +50,7 @@ export function StationsMap({ points, selectedId }: { points: StationPoint[]; se
   const markerRefs = useRef<Map<number, LeafletCircleMarker>>(new Map());
 
   return (
-    <MapContainer center={ROI_ET_CENTER} zoom={12} scrollWheelZoom={false} className="h-full w-full">
+    <MapContainer center={ROI_ET_CENTER} zoom={12} className="h-full w-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -78,6 +79,7 @@ export function StationsMap({ points, selectedId }: { points: StationPoint[]; se
           </CircleMarker>
         );
       })}
+      <ClickToZoom />
       <FlyToSelected selectedId={selectedId} points={points} markerRefs={markerRefs} />
     </MapContainer>
   );

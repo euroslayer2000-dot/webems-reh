@@ -585,3 +585,19 @@ enum medicine_notifications_type {
   medicine_expired
   medicine_low_stock
 }
+
+model AedLocation {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(150)
+  lat         Decimal  @db.Decimal(10, 7)
+  lng         Decimal  @db.Decimal(10, 7)
+  address     String?  @db.VarChar(255)
+  detail      String?  @db.VarChar(255)
+  open_hours  String?  @db.VarChar(150)
+  phone       String?  @db.VarChar(30)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([is_active], map: "idx_aed_locations_active")
+  @@map("aed_locations")
+}

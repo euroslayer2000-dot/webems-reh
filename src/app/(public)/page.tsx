@@ -16,6 +16,7 @@ import { uploadUrl } from "@/lib/upload";
 import { Reveal } from "@/components/public/reveal";
 import { HeroBannerCarousel } from "@/components/public/hero-banner-carousel";
 import { CourseHighlightCard } from "@/components/public/course-highlight-card";
+import { AedNearby } from "@/components/public/aed-nearby";
 
 export const revalidate = 60;
 
@@ -24,7 +25,7 @@ export default async function HomePage() {
   const yearStart = new Date(Date.UTC(currentYear, 0, 1));
   const yearEnd = new Date(Date.UTC(currentYear + 1, 0, 1));
 
-  const [settings, latestNews, galleries, patientStats, heroBanners, emrCourse, emtbCourse, eduPortalCourse] =
+  const [settings, latestNews, galleries, patientStats, heroBanners, emrCourse, emtbCourse, eduPortalCourse, aedLocations] =
     await Promise.all([
       getSettings(),
       prisma.news.findMany({
@@ -55,6 +56,7 @@ export default async function HomePage() {
       prisma.course.findFirst({ where: { slug: "emr", is_active: true } }),
       prisma.course.findFirst({ where: { slug: "emt-b", is_active: true } }),
       prisma.course.findFirst({ where: { slug: "education-portal", is_active: true } }),
+      prisma.aedLocation.findMany({ where: { is_active: true }, orderBy: { name: "asc" } }),
     ]);
 
   const emergencyPhone = settings.emergency_phone || "1669";
@@ -242,19 +244,26 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* --------------------------------------------------------- About --- */}
+      {/* ----------------------------------------------------------- AED --- */}
       <section className="py-[4.5rem]">
         <Container>
-            <Reveal className="flex justify-center">
-              <Image
-                src="/assets/img/emslogo2-crop.png"
-                alt="REH101"
-                width={893}
-                height={475}
-                unoptimized
-                className="h-auto w-[893px] max-w-full"
-              />
-            </Reveal>
+          <Reveal direction="up">
+            <SectionTitle eyebrow="AED Map" eyebrowClassName="bg-[#FFBBDA] text-accent-600" title="แผนที่เครื่อง AED ใกล้ฉัน" />
+          </Reveal>
+          <Reveal direction="up">
+            <AedNearby
+              points={aedLocations.map((a) => ({
+                id: a.id,
+                name: a.name,
+                lat: Number(a.lat),
+                lng: Number(a.lng),
+                address: a.address,
+                detail: a.detail,
+                openHours: a.open_hours,
+                phone: a.phone,
+              }))}
+            />
+          </Reveal>
         </Container>
       </section>
     </div>
