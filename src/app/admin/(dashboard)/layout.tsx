@@ -18,7 +18,7 @@ export default async function AdminDashboardLayout({
   const user = session!.user;
   const role = user.role;
 
-  const [unreadNotifications, unreadContacts, recentNotifications, unreadMedicineNotifications, recentMedicineNotifications] = await Promise.all([
+  const [unreadNotifications, unreadContacts, recentNotifications, unreadMedicineNotifications, recentMedicineNotifications, pendingBorrowRequests] = await Promise.all([
     can(role, "notification") ? prisma.notification.count({ where: { is_read: false } }) : 0,
     can(role, "contact") ? prisma.contact.count({ where: { is_read: false } }) : 0,
     can(role, "notification")
@@ -28,6 +28,7 @@ export default async function AdminDashboardLayout({
     can(role, "notification")
       ? prisma.medicineNotification.findMany({ orderBy: [{ is_read: "asc" }, { created_at: "desc" }], take: 8 })
       : [],
+    can(role, "equipmentborrow") ? prisma.equipmentBorrow.count({ where: { request_status: "pending" } }) : 0,
   ]);
 
   const recentCombined = [
@@ -51,6 +52,7 @@ export default async function AdminDashboardLayout({
         unreadNotifications={unreadNotifications}
         unreadMedicineNotifications={unreadMedicineNotifications}
         unreadContacts={unreadContacts}
+        pendingBorrowRequests={pendingBorrowRequests}
         recentNotifications={recentCombined}
       >
         {children}

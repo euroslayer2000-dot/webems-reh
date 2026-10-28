@@ -6,6 +6,7 @@ import { Container } from "@/components/public/container";
 import { formatDateTh } from "@/lib/format";
 import { EQUIPMENT_STATUS_META } from "@/lib/equipment-status";
 import { EquipmentPhotoGallery } from "@/components/public/equipment-photo-gallery";
+import { BorrowRequestForm } from "./borrow-request-form";
 
 async function getItem(code: string) {
   // Next.js doesn't decode a literal %2F within a dynamic segment (to avoid
@@ -84,6 +85,14 @@ export default async function EquipmentShowPage({ params }: { params: Promise<{ 
               </div>
             )}
           </dl>
+
+          <div className="mt-6 border-t border-border pt-5">
+            {item.status === "available" ? (
+              <BorrowRequestForm equipmentId={item.id} />
+            ) : (
+              <p className="text-center text-sm text-text-muted">ครุภัณฑ์ชิ้นนี้ไม่พร้อมให้ยืมในขณะนี้</p>
+            )}
+          </div>
         </div>
       </div>
     </Container>

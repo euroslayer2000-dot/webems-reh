@@ -167,7 +167,7 @@ export async function deleteEquipment(formData: FormData): Promise<void> {
   await requireActionAccess("equipment");
   const id = Number(formData.get("id"));
 
-  const openLoan = await prisma.equipmentBorrow.findFirst({ where: { equipment_id: id, return_date: null } });
+  const openLoan = await prisma.equipmentBorrow.findFirst({ where: { equipment_id: id, return_date: null, request_status: "approved" } });
   if (openLoan) {
     redirectWithFlash("/admin/equipment", "มีการยืมค้างอยู่ ไม่สามารถลบครุภัณฑ์นี้ได้", "error");
   }

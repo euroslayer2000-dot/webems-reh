@@ -175,12 +175,18 @@ model EquipmentBorrow {
   return_date      DateTime?                           @db.Timestamp(0)
   return_condition equipment_borrows_return_condition?
   note             String?                             @db.Text
+  request_status   borrow_request_status               @default(approved)
+  requested_at     DateTime?                           @db.Timestamp(0)
+  decided_at       DateTime?                           @db.Timestamp(0)
+  decided_by       String?                             @db.VarChar(100)
+  reject_reason    String?                             @db.VarChar(255)
   created_at       DateTime                            @default(now()) @db.Timestamp(0)
   equipment        Equipment                           @relation(fields: [equipment_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_borrow_equipment")
   notifications    Notification[]
 
   @@index([equipment_id], map: "idx_borrow_equipment")
   @@index([return_date], map: "idx_borrow_return_date")
+  @@index([request_status], map: "idx_borrow_request_status")
   @@map("equipment_borrows")
 }
 
@@ -542,6 +548,12 @@ enum equipment_borrows_return_condition {
 enum news_status {
   draft
   published
+}
+
+enum borrow_request_status {
+  pending
+  approved
+  rejected
 }
 
 enum equipment_status {

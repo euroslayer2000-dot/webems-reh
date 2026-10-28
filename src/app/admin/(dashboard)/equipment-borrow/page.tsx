@@ -9,7 +9,8 @@ import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 import { PageHead } from "@/components/admin/page-head";
 import { AdminCard } from "@/components/admin/admin-card";
 import { btnDangerSm, btnGhostSm, btnPrimary } from "@/components/admin/button-styles";
-import { deleteBorrow } from "./actions";
+import { approveBorrowRequest, deleteBorrow } from "./actions";
+import { RejectRequestButton } from "./reject-request-button";
 import { ReturnBorrowButton } from "./return-borrow-button";
 
 const DUE_SOON_DAYS = 3;
@@ -27,15 +28,23 @@ function daysBetween(from: Date, to: Date) {
 
 export default async function AdminEquipmentBorrowPage() {
   await requirePageAccess("equipmentborrow");
-  const loans = await prisma.equipmentBorrow.findMany({
-    include: { equipment: true },
-    orderBy: [{ return_date: "asc" }, { borrow_date: "desc" }],
-  });
+  const [requests, loans] = await Promise.all([
+    prisma.equipmentBorrow.findMany({
+      where: { request_status: "pending" },
+      include: { equipment: true },
+      orderBy: { requested_at: "asc" },
+    }),
+    prisma.equipmentBorrow.findMany({
+      where: { request_status: { not: "pending" } },
+      include: { equipment: true },
+      orderBy: [{ return_date: "asc" }, { borrow_date: "desc" }],
+    }),
+  ]);
 
   const today = new Date();
 
   const reminders = loans
-    .filter((l) => l.return_date === null && l.due_date)
+    .filter((l) => l.request_status === "approved" && l.return_date === null && l.due_date)
     .map((l) => ({ loan: l, daysLeft: daysBetween(today, l.due_date as Date) }))
     .filter((r) => r.daysLeft <= DUE_SOON_DAYS);
 
@@ -76,6 +85,61 @@ export default async function AdminEquipmentBorrowPage() {
         </div>
       )}
 
+      {requests.length > 0 && (
+        <AdminCard className="mb-4 overflow-x-auto">
+          <div className="border-b border-border px-5 py-3 text-sm font-bold text-text">
+            คำร้องขอยืมจาก QR Code รออนุมัติ ({requests.length} รายการ)
+          </div>
+          <table className="w-full text-sm">
+            <thead className="border-b border-border bg-surface-2 text-left text-xs font-semibold uppercase text-text-muted">
+              <tr>
+                <th className="px-5 py-3">ครุภัณฑ์</th>
+                <th className="px-5 py-3">ผู้ขอยืม</th>
+                <th className="px-5 py-3">ติดต่อ</th>
+                <th className="px-5 py-3">วันที่ยื่นคำร้อง</th>
+                <th className="px-5 py-3">กำหนดคืน</th>
+                <th className="px-5 py-3">วัตถุประสงค์</th>
+                <th className="px-5 py-3 text-right">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {requests.map((req) => (
+                <tr key={req.id}>
+                  <td className="px-5 py-2.5">
+                    <div className="font-semibold text-text">{req.equipment.name}</div>
+                    <div className="text-xs text-text-muted">
+                      {req.equipment.code}
+                      {req.equipment.status !== "available" && (
+                        <span className="ml-1.5 rounded-full bg-danger/15 px-2 py-0.5 font-semibold text-danger">ไม่พร้อมให้ยืม</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-5 py-2.5 text-text">{req.borrower_name}</td>
+                  <td className="px-5 py-2.5 text-text-muted">{req.borrower_contact ?? "-"}</td>
+                  <td className="px-5 py-2.5 text-text-muted">{formatDateTh(req.requested_at ?? req.created_at, true)}</td>
+                  <td className="px-5 py-2.5 text-text-muted">{req.due_date ? formatDateTh(req.due_date) : "-"}</td>
+                  <td className="max-w-60 px-5 py-2.5 text-text-muted">{req.note ?? "-"}</td>
+                  <td className="px-5 py-2.5">
+                    <div className="flex justify-end gap-1.5">
+                      <form action={approveBorrowRequest}>
+                        <input type="hidden" name="id" value={req.id} />
+                        <ConfirmSubmitButton
+                          confirmText={`อนุมัติให้ ${req.borrower_name} ยืม "${req.equipment.name}" ?`}
+                          className={btnPrimary}
+                        >
+                          อนุมัติ
+                        </ConfirmSubmitButton>
+                      </form>
+                      <RejectRequestButton loanId={req.id} equipmentName={req.equipment.name} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </AdminCard>
+      )}
+
       <AdminCard className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-surface-2 text-left text-xs font-semibold uppercase text-text-muted">
@@ -93,7 +157,7 @@ export default async function AdminEquipmentBorrowPage() {
           <tbody className="divide-y divide-border">
             {loans.map((loan) => {
               const returned = loan.return_date !== null;
-              const overdue = !returned && loan.due_date !== null && startOfDay(loan.due_date) < startOfDay(today);
+              const overdue = !returned && loan.request_status === "approved" && loan.due_date !== null && startOfDay(loan.due_date) < startOfDay(today);
               const daysLeft = !returned && loan.due_date ? daysBetween(today, loan.due_date) : null;
               const dueSoon = !returned && !overdue && daysLeft !== null && daysLeft <= DUE_SOON_DAYS;
 
@@ -116,7 +180,14 @@ export default async function AdminEquipmentBorrowPage() {
                   <td className="px-5 py-2.5 text-text-muted">{loan.due_date ? formatDateTh(loan.due_date) : "-"}</td>
                   <td className="px-5 py-2.5 text-text-muted">{loan.return_date ? formatDateTh(loan.return_date, true) : "-"}</td>
                   <td className="px-5 py-2.5">
-                    {returned ? (
+                    {loan.request_status === "rejected" ? (
+                      <span
+                        className="rounded-full bg-bg-soft px-2.5 py-1 text-xs font-semibold text-text-muted"
+                        title={loan.reject_reason ?? undefined}
+                      >
+                        ปฏิเสธคำร้อง
+                      </span>
+                    ) : returned ? (
                       loan.return_condition === "damaged" ? (
                         <span className="rounded-full bg-danger/15 px-2.5 py-1 text-xs font-semibold text-danger">คืนแล้ว (ชำรุด)</span>
                       ) : (
@@ -132,7 +203,7 @@ export default async function AdminEquipmentBorrowPage() {
                   </td>
                   <td className="px-5 py-2.5">
                     <div className="flex justify-end gap-1.5">
-                      {!loan.return_date && <ReturnBorrowButton loanId={loan.id} equipmentName={loan.equipment.name} />}
+                      {!loan.return_date && loan.request_status === "approved" && <ReturnBorrowButton loanId={loan.id} equipmentName={loan.equipment.name} />}
                       <Link href={`/admin/equipment-borrow/${loan.id}/edit`} className={btnGhostSm}>แก้ไข</Link>
                       <form action={deleteBorrow}>
                         <input type="hidden" name="id" value={loan.id} />

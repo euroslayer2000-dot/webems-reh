@@ -63,4 +63,37 @@ test.describe("equipment borrow/return lifecycle", () => {
     await page.goto("/admin/equipment");
     await expect(page.locator("tr", { hasText: CODE }).getByText("พร้อมใช้งาน")).toBeVisible();
   });
+
+  test("QR request: public submits, admin approves; return is admin-only", async ({ page, browser }) => {
+    await page.goto("/admin/equipment/create");
+    await page.fill("#code", CODE);
+    await page.fill("#name", EQUIPMENT_NAME);
+    await page.click('button[type="submit"]');
+    await page.waitForURL("**/admin/equipment");
+
+    // Anonymous visitor scanning the QR code.
+    const anon = await (await browser.newContext()).newPage();
+    await anon.goto(`/equipment/show/${CODE}`);
+    await anon.getByRole("button", { name: "ขอยืมครุภัณฑ์ชิ้นนี้" }).click();
+    await anon.fill("#borrower_name", BORROWER);
+    await anon.fill("#borrower_contact", "0812345678");
+    await anon.getByRole("button", { name: "ส่งคำร้อง" }).click();
+    await expect(anon.getByText("ส่งคำร้องขอยืมเรียบร้อยแล้ว")).toBeVisible();
+
+    // Still available until an admin approves.
+    await page.goto("/admin/equipment");
+    await expect(page.locator("tr", { hasText: CODE }).getByText("พร้อมใช้งาน")).toBeVisible();
+
+    await page.goto("/admin/equipment-borrow");
+    page.once("dialog", (d) => d.accept());
+    await page.locator("tr", { hasText: BORROWER }).getByRole("button", { name: "อนุมัติ" }).click();
+    await page.waitForLoadState("networkidle");
+
+    await page.goto("/admin/equipment");
+    await expect(page.locator("tr", { hasText: CODE }).getByText("ถูกยืม")).toBeVisible();
+
+    // The public page offers no way to borrow or return once it's on loan.
+    await anon.reload();
+    await expect(anon.getByText("ไม่พร้อมให้ยืมในขณะนี้")).toBeVisible();
+  });
 });

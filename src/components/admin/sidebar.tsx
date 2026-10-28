@@ -47,6 +47,7 @@ export function Sidebar({
   unreadNotifications,
   unreadMedicineNotifications,
   unreadContacts,
+  pendingBorrowRequests,
   mobileOpen,
   onNavigate,
 }: {
@@ -54,6 +55,7 @@ export function Sidebar({
   unreadNotifications: number;
   unreadMedicineNotifications: number;
   unreadContacts: number;
+  pendingBorrowRequests: number;
   mobileOpen: boolean;
   onNavigate: () => void;
 }) {
@@ -64,7 +66,7 @@ export function Sidebar({
   });
 
   const badgeFor = (item: NavLeaf) =>
-    item.badge === "notification" ? unreadNotifications : item.badge === "medicineNotification" ? unreadMedicineNotifications : item.badge === "contact" ? unreadContacts : 0;
+    item.badge === "notification" ? unreadNotifications : item.badge === "medicineNotification" ? unreadMedicineNotifications : item.badge === "contact" ? unreadContacts : item.badge === "borrowRequest" ? pendingBorrowRequests : 0;
 
   return (
     <aside

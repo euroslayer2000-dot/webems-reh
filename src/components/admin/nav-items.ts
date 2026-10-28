@@ -27,7 +27,7 @@ export type NavLeaf = {
   label: string;
   href: string;
   icon: LucideIcon;
-  badge?: "notification" | "medicineNotification" | "contact";
+  badge?: "notification" | "medicineNotification" | "contact" | "borrowRequest";
 };
 
 export type NavEntry =
@@ -58,7 +58,7 @@ export const NAV_CONTENT: NavEntry[] = [
       { module: "equipment", label: "หน้าแรก", href: "/admin/equipment/dashboard", icon: LayoutGrid },
       { module: "equipment", label: "ครุภัณฑ์ทั้งหมด", href: "/admin/equipment", icon: Package },
       { module: "equipmentcategory", label: "หมวดหมู่ครุภัณฑ์", href: "/admin/equipment-category", icon: Tags },
-      { module: "equipmentborrow", label: "ยืม-คืนครุภัณฑ์", href: "/admin/equipment-borrow", icon: ArrowLeftRight },
+      { module: "equipmentborrow", label: "ยืม-คืนครุภัณฑ์", href: "/admin/equipment-borrow", icon: ArrowLeftRight, badge: "borrowRequest" },
       { module: "equipment", label: "ตรวจนับครุภัณฑ์", href: "/admin/equipment-stock-take", icon: ClipboardCheck },
       { module: "notification", label: "การแจ้งเตือน", href: "/admin/notification", icon: Bell, badge: "notification" },
     ],

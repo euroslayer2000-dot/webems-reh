@@ -63,7 +63,7 @@ export default async function AdminDashboardPage() {
     showEquipment ? prisma.equipment.count() : 0,
     showGallery ? prisma.gallery.count() : 0,
     showBanner ? prisma.banner.count({ where: { is_active: true } }) : 0,
-    showEquipmentBorrow ? prisma.equipmentBorrow.count({ where: { return_date: null, due_date: { lt: new Date() } } }) : 0,
+    showEquipmentBorrow ? prisma.equipmentBorrow.count({ where: { return_date: null, request_status: "approved", due_date: { lt: new Date() } } }) : 0,
     showEquipment
       ? prisma.equipmentMaintenanceSchedule.count({ where: { completed_date: null, scheduled_date: { lte: maintenanceDueSoonCutoff } } })
       : 0,

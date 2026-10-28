@@ -38,8 +38,8 @@ export default async function EquipmentDashboardPage({
       prisma.equipment.count(),
       prisma.equipment.groupBy({ by: ["status"], _count: true }),
       prisma.equipmentCategory.count(),
-      prisma.equipmentBorrow.count({ where: { return_date: null } }),
-      prisma.equipmentBorrow.count({ where: { return_date: null, due_date: { lt: new Date() } } }),
+      prisma.equipmentBorrow.count({ where: { return_date: null, request_status: "approved" } }),
+      prisma.equipmentBorrow.count({ where: { return_date: null, request_status: "approved", due_date: { lt: new Date() } } }),
       prisma.equipment.groupBy({ by: ["category_id"], _count: true }),
       prisma.notification.findMany({ orderBy: [{ is_read: "asc" }, { created_at: "desc" }], take: 8 }),
     ]);
@@ -61,7 +61,10 @@ export default async function EquipmentDashboardPage({
   );
 
   const periodRange = periodDateRange(period);
-  const periodWhere = periodRange ? { borrow_date: { gte: periodRange.gte, lte: periodRange.lte } } : {};
+  const periodWhere = {
+    request_status: "approved" as const,
+    ...(periodRange ? { borrow_date: { gte: periodRange.gte, lte: periodRange.lte } } : {}),
+  };
 
   const [periodLoanCount, recentLoans] = await Promise.all([
     prisma.equipmentBorrow.count({ where: periodWhere }),

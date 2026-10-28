@@ -34,7 +34,7 @@ export async function syncEquipmentDueSoon(days = 3): Promise<void> {
   cutoff.setDate(cutoff.getDate() + days);
 
   const openLoans = await prisma.equipmentBorrow.findMany({
-    where: { return_date: null, due_date: { not: null, lte: cutoff } },
+    where: { return_date: null, request_status: "approved", due_date: { not: null, lte: cutoff } },
     include: { equipment: true },
   });
 

@@ -88,12 +88,72 @@ export async function updateBorrow(id: number, _prev: BorrowFormState, formData:
   redirectWithFlash("/admin/equipment-borrow", "บันทึกการแก้ไขเรียบร้อยแล้ว");
 }
 
+export async function approveBorrowRequest(formData: FormData): Promise<void> {
+  const user = await requireActionAccess("equipmentborrow");
+  const id = Number(formData.get("id"));
+  const loan = await prisma.equipmentBorrow.findUnique({ where: { id }, include: { equipment: true } });
+
+  if (!loan || loan.request_status !== "pending") {
+    redirectWithFlash("/admin/equipment-borrow", "ไม่พบคำร้อง หรือดำเนินการไปแล้ว", "error");
+  }
+  if (loan.equipment.status !== "available") {
+    redirectWithFlash("/admin/equipment-borrow", "ครุภัณฑ์ชิ้นนี้ไม่พร้อมให้ยืมแล้ว ไม่สามารถอนุมัติได้", "error");
+  }
+
+  const now = new Date();
+  const decidedBy = user.name ?? user.id;
+  // One transaction: the conditional claim keeps two concurrent approvals for
+  // the same item from both succeeding, and a failure partway rolls back.
+  const approved = await prisma.$transaction(async (tx) => {
+    const claimed = await tx.equipment.updateMany({
+      where: { id: loan.equipment_id, status: "available" },
+      data: { status: "borrowed" },
+    });
+    if (claimed.count === 0) return false;
+
+    const decided = await tx.equipmentBorrow.updateMany({
+      where: { id, request_status: "pending" },
+      data: { request_status: "approved", borrow_date: now, decided_at: now, decided_by: decidedBy },
+    });
+    if (decided.count === 0) throw new Error("request already decided");
+
+    // Competing requests for the same item can no longer be fulfilled.
+    await tx.equipmentBorrow.updateMany({
+      where: { equipment_id: loan.equipment_id, request_status: "pending", id: { not: id } },
+      data: { request_status: "rejected", decided_at: now, decided_by: decidedBy, reject_reason: "ครุภัณฑ์ถูกยืมโดยผู้อื่นแล้ว" },
+    });
+    return true;
+  });
+  if (!approved) {
+    redirectWithFlash("/admin/equipment-borrow", "ครุภัณฑ์ชิ้นนี้ไม่พร้อมให้ยืมแล้ว ไม่สามารถอนุมัติได้", "error");
+  }
+  await logStatusChange(loan.equipment_id, "available", "borrowed", `อนุมัติคำร้องยืมของ ${loan.borrower_name}`);
+
+  redirectWithFlash("/admin/equipment-borrow", "อนุมัติคำร้องเรียบร้อยแล้ว");
+}
+
+export async function rejectBorrowRequest(formData: FormData): Promise<void> {
+  const user = await requireActionAccess("equipmentborrow");
+  const id = Number(formData.get("id"));
+  const reason = String(formData.get("reject_reason") ?? "").trim().slice(0, 255);
+
+  const result = await prisma.equipmentBorrow.updateMany({
+    where: { id, request_status: "pending" },
+    data: { request_status: "rejected", decided_at: new Date(), decided_by: user.name ?? user.id, reject_reason: reason || null },
+  });
+  if (result.count === 0) {
+    redirectWithFlash("/admin/equipment-borrow", "ไม่พบคำร้อง หรือดำเนินการไปแล้ว", "error");
+  }
+
+  redirectWithFlash("/admin/equipment-borrow", "ปฏิเสธคำร้องเรียบร้อยแล้ว");
+}
+
 export async function returnBorrow(formData: FormData): Promise<void> {
   await requireActionAccess("equipmentborrow");
   const id = Number(formData.get("id"));
   const loan = await prisma.equipmentBorrow.findUniqueOrThrow({ where: { id } });
 
-  if (loan.return_date !== null) {
+  if (loan.return_date !== null || loan.request_status !== "approved") {
     redirectWithFlash("/admin/equipment-borrow", "ไม่พบรายการยืม หรือคืนแล้ว", "error");
   }
 
@@ -112,7 +172,8 @@ export async function deleteBorrow(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   const loan = await prisma.equipmentBorrow.findUniqueOrThrow({ where: { id } });
 
-  if (loan.return_date === null) {
+  // Only an approved, unreturned loan ever flipped the equipment to borrowed.
+  if (loan.return_date === null && loan.request_status === "approved") {
     await prisma.equipment.update({ where: { id: loan.equipment_id }, data: { status: "available" } });
     await logStatusChange(loan.equipment_id, "borrowed", "available", "ลบรายการยืม");
   }

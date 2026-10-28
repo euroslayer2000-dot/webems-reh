@@ -14,6 +14,7 @@ export function AdminShell({
   unreadNotifications,
   unreadMedicineNotifications,
   unreadContacts,
+  pendingBorrowRequests,
   recentNotifications,
   children,
 }: {
@@ -24,6 +25,7 @@ export function AdminShell({
   unreadNotifications: number;
   unreadMedicineNotifications: number;
   unreadContacts: number;
+  pendingBorrowRequests: number;
   recentNotifications: TopbarNotification[];
   children: ReactNode;
 }) {
@@ -36,6 +38,7 @@ export function AdminShell({
         unreadNotifications={unreadNotifications}
         unreadMedicineNotifications={unreadMedicineNotifications}
         unreadContacts={unreadContacts}
+        pendingBorrowRequests={pendingBorrowRequests}
         mobileOpen={mobileOpen}
         onNavigate={() => setMobileOpen(false)}
       />
