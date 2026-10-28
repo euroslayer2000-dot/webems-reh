@@ -27,6 +27,7 @@ export const modulePermissions: Record<string, Role[]> = {
   medicinecategory: ["superadmin", "admin", "editor"],
   medicinedispense: ["superadmin", "admin", "editor"],
   notification: ["superadmin", "admin", "editor"],
+  ftems: ["superadmin", "admin", "editor"],
 
   contact: ["superadmin", "admin"],
   setting: ["superadmin", "admin"],

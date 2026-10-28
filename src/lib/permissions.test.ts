@@ -36,7 +36,7 @@ describe("can()", () => {
         "dashboard", "news", "category", "personnel", "structure", "station",
         "gallery", "course", "patientreport", "download", "banner", "equipment", "equipmentcategory",
         "equipmentborrow", "medicine", "medicinecategory", "medicinedispense",
-        "notification", "contact", "setting", "user",
+        "notification", "contact", "setting", "user", "aed", "ftems",
       ].sort()
     );
   });

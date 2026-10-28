@@ -17,6 +17,7 @@ import {
   Package,
   Pill,
   Settings,
+  Table2,
   Tags,
   UserCog,
   Users,
@@ -49,6 +50,15 @@ export const NAV_CONTENT: NavEntry[] = [
   { module: "course", label: "หลักสูตรการเรียน", href: "/admin/course", icon: GraduationCap },
   { module: "patientreport", label: "ข้อมูลรับแจ้งเหตุ", href: "/admin/patient-report", icon: ClipboardList },
   { module: "download", label: "เอกสารดาวน์โหลด", href: "/admin/download", icon: FileDown },
+  {
+    kind: "group",
+    label: "FT EMS REH 2570",
+    icon: Table2,
+    items: [
+      { module: "ftems", label: "บันทึกข้อมูล", href: "/admin/ft-ems", icon: ClipboardList },
+      { module: "ftems", label: "ตารางสรุป", href: "/admin/ft-ems/summary", icon: Table2 },
+    ],
+  },
   {
     kind: "group",
     label: "ครุภัณฑ์",
